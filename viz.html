@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>Wash4All</title>
+
+  <!--D3 -->
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+  <nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="./index.html" class="brand-logo"> <span class="material-icons">language</span> OpenSourceWater</a>
+      <ul class="right hide-on-med-and-down">
+        <li ><a href="./about.html">About</a></li>
+      </ul>
+      <ul class="right hide-on-med-and-down">
+        <li ><a href="./data.html">Data Downloads</a></li>
+      </ul>
+      <ul class="right hide-on-med-and-down">
+        <li class="active"><a href="./viz.html">Data Visualization</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="side-nav">
+        <li><a href="./about.html">About</a></li>
+      </ul>
+      <ul id="nav-mobile" class="side-nav">
+        <li ><a href="./data.html">Data Downloads</a></li>
+      </ul>
+      <ul id="nav-mobile" class="side-nav">
+        <li class="active"><a href="./viz.html">Data Visualization</a></li>
+      </ul>
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <!--<h1 class="header center orange-text">Wash4All</h1>-->
+      <div class="row center">
+        <h5 class="header col s12 light">Monitor the performance of AguaClara plants in Honduras in real time!</h5>
+      </div>
+
+      <div class="row left">
+        <h4>Data Visualization</h4>
+      </div> 
+
+
+      
+
+      <div class="row center"> 
+
+  
+    
+      </div>
+    </div>
+
+        
+  </div>
+
+  <div class="container">
+    <div class="section">
+
+      <div id="visualizer"></div>
+
+      <style>
+        svg { border: solid black 1px; }
+        .bar rect { fill: #ccc; }
+        .axis path { fill: none; stroke: black;}
+        .axis line { stroke: black; }
+        .axis text { font-size: x-small; }
+        .brush .extent {
+          stroke: #fff;
+          fill-opacity: .125;
+          shape-rendering: crispEdges;
+        }
+      </style>
+      <script>
+          
+        var usdaData;
+        var points;
+
+        d3.json("past_data.json", function(error, rows){
+          var height = 500;
+          var width = 700;
+        });
+
+        <script> 
+
+        // Map of Outbreaks Portion
+        var MAP_HEIGHT = 550,
+            MAP_WIDTH = 900;
+
+        var MAX_CIRCLE_SIZE = 50,
+            MIN_CIRCLE_SIZE = 5;
+
+        var monthDict = {1:'Jan', 2:'Feb', 3:'Mar', 4:'Apr', 5:'May', 6:'Jun', 7:'Jul', 8:'Aug', 9:'Sep', 10:'Oct', 11:'Nov', 12:'Dec'};
+
+        var mapSVG = d3.select("#visualizer").append("svg")
+            .attr("height",MAP_HEIGHT)
+            .attr("width", MAP_WIDTH)
+            .style("margin", "0 auto");
+
+        var g = mapSVG.append("g");
+        //place projection within bounds of the svg element
+        var projection = d3.geo.albersUsa();
+        var path = d3.geo.path().projection(projection);
+
+
+            d3.json("data/us-10m.json", function(error, mapData) {
+                //create and color map
+                g.selectAll("path").data(topojson.feature(mapData,mapData.objects.states).features)
+                .enter().append("path")
+                .attr("d", path)
+                .style("stroke", "white")
+                .style("fill","lightgray")
+                .style("stroke-width", 1);
+                
+                var coords; 
+                
+                //pins
+                var circles = mapSVG.selectAll("circle").data(stories).enter().append("circle")
+                    .attr("cx", function(outbreak){coords = projection([outbreak.Longitude, outbreak.Latitude]); return coords[0];})
+                    .attr("cy", function(outbreak){coords = projection([outbreak.Longitude, outbreak.Latitude]); return coords[1];})
+                    .attr("r", function(outbreak){return radiusScale(outbreak['Number Affected']);})
+                    .style("fill", "maroon")
+                    .style("opacity", 0.5)
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide);
+
+            //$(".yr").click(function(){
+                // //$(".yr").css("font-size","");
+                // //$(this).css("font-size", "1.6em");
+                // var clicked = $(this);
+                // var yrVal = clicked[0].innerHTML;
+                // $(".yr").css("font-size",function(p){
+                //     v = $(".yr")[p];
+                //     if(v.innerHTML< yrVal){return "1.2em";}
+                //     else if(v.innerHTML == yrVal){return "2.1em";}
+                //     else{return ".9em";}
+                // });
+                // circles.transition().style("opacity", function(d){
+                //     if(d.Year<=yrVal || yrVal=="View All"){
+                //         return .5;
+                //     }else{
+                //         return 0;
+                //     }   
+                // });
+                // circles.on("mouseover", function(d){
+                //     mapSVG.call(tip);
+                //     if (d.Year <= yrVal || yrVal=="View All"){return tip.show(d);}
+                //     else{return tip.hide(d);}
+                // });
+            });
+
+
+        }) 
+        
+
+
+
+      </script>
+
+    </div>
+    <br><br>
+
+    <div class="section">
+
+    </div>
+  </div>
+
+
+  <footer class="page-footer light-blue">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">About OpenSourceWater</h5>
+          <p class="grey-text text-lighten-4">Billions of people make do with unsafe water and inadequate sanitation treatment; development projects that aim to fix this frequently cost too much, achieve too little, and leave little or no public record. WASH for All is tracking the path towards universal access to water and sanitation by mapping the world’s knowledge of where these needs are unmet, who is working to meet them, and how.</p>
+
+
+        </div>
+        
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+      Made by <a class="light-blue-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+      </div>
+    </div>
+  </footer>
+
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+
+  </body>
+</html>

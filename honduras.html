@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+#map { background-color: #b6e2ea; }
+
+.subunit.HND { fill: #e7e7e8; }
+.subunit.BLZ { fill: #939597; }
+.subunit.GTM { fill: #939597; }
+.subunit.SLV { fill: #939597; }
+.subunit.NIC { fill: #939597; }
+
+.subunit-boundary {
+  fill: none;
+  stroke: #57585a;
+  stroke-linejoin: round;
+  stroke-width: 0.7;
+  text-stroke: 10px black;
+}
+
+.place {
+  fill: #fff;
+  stroke-width: 0.75;
+  stroke: #000;
+}
+
+
+.place-label {
+  fill: #444;
+  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+}
+
+.subunit-label {
+  fill: #4e4e4e;
+  font-size: 16px;
+  font-weight: bold;
+  text-anchor: middle;
+  text-transform: uppercase;
+/*text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;*/
+}
+
+.ocean-label {
+  fill: #5CB1BF;
+  font-size: 14px;
+  font-style: italic;
+  letter-spacing: 4px;
+}
+
+text {
+  font-family: "Gill Sans MT", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 200px;
+  pointer-events: none;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script>
+
+var w = 400;
+ 	h = 300;
+ 	
+var projection = d3.geo.mercator()
+	.translate([w/2, h/2])
+	.center([-86.5, 14.59])
+	.scale(3300);
+
+var path = d3.geo.path()
+       .projection(projection)
+//Set place dot radius
+//	path.pointRadius(4);
+
+var svg = d3.select("body")
+	.append("svg")
+	.attr("width", w)
+	.attr("height", h)
+	.attr("id", "map");
+
+	//Load GeoJSON data
+	d3.json("hond.json", function(error, hond) {
+
+	//Bind data
+		svg.selectAll(".subunit")
+		    .data(topojson.feature(hond, hond.objects.subunits).features)
+		  .enter().append("path")
+		    .attr("class", function(d) { return "subunit " + d.id; })
+		    .attr("d", path);
+
+		svg.append("path")
+		    .datum(topojson.mesh(hond, hond.objects.subunits))
+		    .attr("d", path)
+		    .attr("class", "subunit-boundary");
+		
+		svg.append("path")
+			.datum(topojson.feature(hond, hond.objects.places))
+			.attr("d", path)
+			.attr("class", "place");
+
+//Show place objects in console
+console.log(topojson.feature(hond, hond.objects.places).features)
+
+		svg.selectAll(".place-label")
+		    .data(topojson.feature(hond, hond.objects.places).features)
+		  .enter().append("text")
+		    .attr("class", "place-label")
+		    .attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; })
+		    .attr("x", function(d) { return d.geometry.coordinates[0] > -1 ? 6 : -6; })
+		    .attr("dy", ".35em")
+		    .style("text-anchor", function(d) { return d.geometry.coordinates[0] > -1 ? "start" : "end"; })
+		    .text(function(d) { return d.properties.name; });
+
+//Hard coding ocean labels
+//Will want to append to coordinates (unique for each base map) for easier portability
+		svg.append("text")
+		 	.attr("class", "ocean-label")
+		 	.attr("x", 12)
+		 	.attr("dy", 280)
+		 	.style("text-anchor", "start")
+		 	.text("Pacific Ocean");
+
+		svg.append("text")
+		 	.attr("class", "ocean-label")
+		 	.attr("x", 255)
+		 	.attr("dy", 43)
+		 	.style("text-anchor", "start")
+		 	.text("Caribbean Sea");
+
+		svg.selectAll(".subunit-label")
+		    //Filter out Guatemala label
+			.data(topojson.feature(hond, hond.objects.subunits).features.filter(function(e){return e.properties.name != 'Guatemala'}))
+		  .enter().append("text")
+		    .attr("class", function(d) { return "subunit-label " + d.id; })
+		    .attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
+		    .attr("dy", ".35em")
+		    .text(function(d) { return d.properties.name; });
+
+/*        var imgs = svg.selectAll("image").data([0]);
+            imgs.enter()
+            .append("svg:image")
+            .attr("xlink:href", "http://farm3.staticflickr.com/2854/12801707814_08040b316f_s.jpg")
+            .attr("x", "355")
+            .attr("y", "255")
+            .attr("width", "40")
+            .attr("height", "40");
+*/
+	});
+
+
+
+</script>
