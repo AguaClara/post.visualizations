@@ -7,6 +7,9 @@
 
   <!--D3 -->
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script> 
+  <!--tooltip-->
+  <script src="js/tip.js"></script>
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
@@ -78,27 +81,71 @@
           fill-opacity: .125;
           shape-rendering: crispEdges;
         }
+
+
+        .d3-tip {
+          pointer-events:none;
+          -webkit-touch-callout: none; /* iOS Safari */
+          -webkit-user-select: none;   /* Chrome/Safari/Opera */
+          -khtml-user-select: none;    /* Konqueror */
+          -moz-user-select: none;      /* Firefox */
+          -ms-user-select: none;       /* IE/Edge */
+          user-select: none;           /* non-prefixed version, currently
+                                          not supported by any browser */
+          line-height: 1;
+          font-weight: bold;
+          padding: 12px;
+          background: rgba(0, 0, 0, 0.8);
+          color: #fff;
+          border-radius: 2px;
+        }
+
+        /* Creates a small triangle extender for the tooltip */
+        .d3-tip:after {
+          box-sizing: border-box;
+          display: inline;
+          font-size: 10px;
+          width: 100%;
+          line-height: 1;
+          color: rgba(0, 0, 0, 0.8);
+          content: "\25BC";
+          position: absolute;
+          text-align: center;
+        }
+
+        /* Style northward tooltips differently */
+        .d3-tip.n:after {
+          margin: -1px 0 0 0;
+          top: 100%;
+          left: 0;
+        }
+        .d3-tip.s:after {
+          content: "\25B2";
+          margin: 0 0 1px 0;
+          top: -8px;
+          left: 0;
+          text-align: center;
+        }
       </style>
       <script>
-          
-        var usdaData;
-        var points;
+      var plantCoords = [
+        {"lat": 14.446363, "longi" : -87.265564, "name":"Agalteca"},
+        {"lat": 13.852931, "longi" : -86.685029, "name":"Alauca"},
+        {"lat": 14.929551, "longi" : -88.490029, "name":"Atima"},
+        {"lat": 14.248744, "longi" : -87.412891, "name":"Cuatro Comunidades"},
+        {"lat": 14.492795, "longi" : -87.977579, "name":"Jesus de Otoro"},
+        {"lat": 14.156052, "longi" : -88.036309, "name":"Marcala"},
+        {"lat": 14.123442, "longi" : -86.869707, "name":"Moroceli"},
+        {"lat": 13.980974, "longi" : -86.623315, "name":"San Matias"},
+        {"lat": 15.000367, "longi" : -88.731957, "name":"San Nicolas"},
+        {"lat": 14.189934, "longi" : -87.331426, "name":"Tamara"}
+      ];
 
-        d3.json("past_data.json", function(error, rows){
-          var height = 500;
-          var width = 700;
-        });
+        var MAP_HEIGHT = 400;
+        var MAP_WIDTH = 700;
 
-        <script> 
-
-        // Map of Outbreaks Portion
-        var MAP_HEIGHT = 550,
-            MAP_WIDTH = 900;
-
-        var MAX_CIRCLE_SIZE = 50,
-            MIN_CIRCLE_SIZE = 5;
-
-        var monthDict = {1:'Jan', 2:'Feb', 3:'Mar', 4:'Apr', 5:'May', 6:'Jun', 7:'Jul', 8:'Aug', 9:'Sep', 10:'Oct', 11:'Nov', 12:'Dec'};
+        var selected = "blue";
+        var unselected = "maroon";
 
         var mapSVG = d3.select("#visualizer").append("svg")
             .attr("height",MAP_HEIGHT)
@@ -107,60 +154,85 @@
 
         var g = mapSVG.append("g");
         //place projection within bounds of the svg element
-        var projection = d3.geo.albersUsa();
+        var projection = d3.geo.mercator().scale([5000]).translate([7900,1500]);
         var path = d3.geo.path().projection(projection);
 
+        var coords; //will hold coordinate pairs in loop
+        var paddingText = 17; //offset my label text below map pins
 
-            d3.json("data/us-10m.json", function(error, mapData) {
-                //create and color map
-                g.selectAll("path").data(topojson.feature(mapData,mapData.objects.states).features)
-                .enter().append("path")
-                .attr("d", path)
-                .style("stroke", "white")
-                .style("fill","lightgray")
-                .style("stroke-width", 1);
-                
-                var coords; 
-                
-                //pins
-                var circles = mapSVG.selectAll("circle").data(stories).enter().append("circle")
-                    .attr("cx", function(outbreak){coords = projection([outbreak.Longitude, outbreak.Latitude]); return coords[0];})
-                    .attr("cy", function(outbreak){coords = projection([outbreak.Longitude, outbreak.Latitude]); return coords[1];})
-                    .attr("r", function(outbreak){return radiusScale(outbreak['Number Affected']);})
-                    .style("fill", "maroon")
-                    .style("opacity", 0.5)
-                    .on('mouseover', tip.show)
-                    .on('mouseout', tip.hide);
+        var tip = d3.tip()
+          .attr('class', 'd3-tip')
+          .offset(function(d){if(d.lat>14.3){return [-25, 0];}else if(d.name=="Moroceli"){return [30,0];}else{return [25,0];}})
+          .direction(function(d){
+            if(d.lat<14.3){return 's';}else{return 'n';}
+          })
+          .html(function(d){if(d.name=="Jesus de Otoro"){return "Jesus<br/>&nbsp;&nbsp;&nbsp;de<br/>Otoro";}return d.name;});
 
-            //$(".yr").click(function(){
-                // //$(".yr").css("font-size","");
-                // //$(this).css("font-size", "1.6em");
-                // var clicked = $(this);
-                // var yrVal = clicked[0].innerHTML;
-                // $(".yr").css("font-size",function(p){
-                //     v = $(".yr")[p];
-                //     if(v.innerHTML< yrVal){return "1.2em";}
-                //     else if(v.innerHTML == yrVal){return "2.1em";}
-                //     else{return ".9em";}
-                // });
-                // circles.transition().style("opacity", function(d){
-                //     if(d.Year<=yrVal || yrVal=="View All"){
-                //         return .5;
-                //     }else{
-                //         return 0;
-                //     }   
-                // });
-                // circles.on("mouseover", function(d){
-                //     mapSVG.call(tip);
-                //     if (d.Year <= yrVal || yrVal=="View All"){return tip.show(d);}
-                //     else{return tip.hide(d);}
-                // });
-            });
+        mapSVG.call(tip);
 
+        d3.json("world-50m.json", function(error, world){
+          //create and color map
+          var countries = topojson.feature(world, world.objects.countries).features;
+          g.selectAll("path")
+          .data(countries)
+          .enter().append("path")
+          .attr("d", path)
+          .style("fill", function(country) {
+              // The data in the JSON file does not contain country names, only ISO-3166 numeric ids.
+              if (country.id === 340){
+                return "#E0E0EB";
+              }
+              else{
+                return "white";
+              }
+          })
+          .style("stroke", "white");
+          
+          
 
-        }) 
+          // plantCoords.forEach(function(d){ 
+          //   coords = projection([d.longi, d.lat]);  
+          //   //pins
+          //   mapSVG.append("circle")
+          //     .attr("cx", coords[0])
+          //     .attr("cy", coords[1])
+          //     .attr("r", 5)
+          //     .style("fill", "maroon");
+          //   //labels
+          //   mapSVG.append("text")
+          //     .text(d.name)
+          //     .attr("x", coords[0])
+          //     .attr("y", coords[1] + paddingText)
+          //     .attr("alignment-baseline", "middle")
+          //     .attr("text-anchor", "middle");
+          // })
+        });
+
+        var circles = mapSVG.selectAll("circle").data(plantCoords).enter().append("circle")
+          .attr("cx", function(coord){coords = projection([coord.longi, coord.lat]); return coords[0];})
+          .attr("cy", function(coord){coords = projection([coord.longi, coord.lat]); return coords[1];})
+          .attr("r", 5)
+          .attr("name", function(coord){return coord.name;})
+          .style("fill", unselected);
+                  
+        circles.on("mouseover", function(d){
+          d3.select(this).style("fill", selected)
+          tip.show(d);
+        });
+
+        circles.on("mouseout", function(d){
+          d3.select(this).style("fill", unselected); 
+          tip.hide(d);
+        });
+
+        circles.on("click", function(d){
+
+        })
         
 
+        d3.json("past_data.json", function(error, rows){
+          
+        });
 
 
       </script>
