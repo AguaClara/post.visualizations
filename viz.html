@@ -187,25 +187,6 @@
               }
           })
           .style("stroke", "white");
-          
-          
-
-          // plantCoords.forEach(function(d){ 
-          //   coords = projection([d.longi, d.lat]);  
-          //   //pins
-          //   mapSVG.append("circle")
-          //     .attr("cx", coords[0])
-          //     .attr("cy", coords[1])
-          //     .attr("r", 5)
-          //     .style("fill", "maroon");
-          //   //labels
-          //   mapSVG.append("text")
-          //     .text(d.name)
-          //     .attr("x", coords[0])
-          //     .attr("y", coords[1] + paddingText)
-          //     .attr("alignment-baseline", "middle")
-          //     .attr("text-anchor", "middle");
-          // })
         });
 
         var circles = mapSVG.selectAll("circle").data(plantCoords).enter().append("circle")
@@ -230,11 +211,113 @@
         })
         
 
-        d3.json("past_data.json", function(error, rows){
+        
+
+
+      </script>
+
+      <div id="plot"></div>
+
+      <script> 
+      var data;
+      d3.json("past_data.json", function(error, rows){
+        data =rows;
+
+        function sortByDateAscending(a, b) {
+            // Dates will be cast to numbers automagically:
+            return new Date(a.date_submitted) - new Date(b.date_submitted);
+        }
+        data = data.sort(sortByDateAscending);
+
+        var height = 500;
+        var width = 900;
+        var plot_padding = 40;
+
+        var svg = d3.select("#plot").append("svg")
+        .attr("height", height)
+        .attr("width", width);
+
+
+        var xMin = new Date(data[0].date_submitted);//d3.min(data, function(d){return new Date(d.date_submitted);});// //
+        var xMax = new Date(data[data.length -1].date_submitted);//d3.max(data, function(d){return new Date(d.date_submitted);});// //
+        var xScale = d3.time.scale()
+          .domain([xMin, xMax])
+          .range([plot_padding, width-plot_padding]);
+        
+        var yScale = d3.scale.linear()
+          .domain([0, d3.max(data, function (d) {return d.raw_turb; })])
+          .range([height-plot_padding, plot_padding]);
+
+        var xAxis = d3.svg.axis().scale(xScale);
+        svg.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate("+0+", " + (height-plot_padding) + ")")
+          .call(xAxis);
           
-        });
+
+        var yAxis = d3.svg.axis().scale(yScale).orient("left");
+        svg.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(" + plot_padding + ", "+ 0+")")
+          .call(yAxis);
+        
+        var lineGen = d3.svg.line()
+        .x(function(d) {
+            return xScale(new Date(d.date_submitted));
+        })
+        .y(function(d) {
+            return yScale(d.raw_turb);
+        })
+        .defined(function(d) { return !isNaN(d.raw_turb) & d.code == "ati"; });;  
+
+        svg.append('g').append("path")
+          //.data(data)
+          //.enter().append("path")
+          .attr('d', lineGen(data))
+          .attr('stroke', "green")
+          .attr('stroke-width', 2)
+          .attr('fill', 'none');
 
 
+        // function generateLinear(slope, intercept, noise) {
+        //   var x = gaussian();
+        //   var y = x * slope + intercept + noise * gaussian();
+          
+        //   return { x: x, y: y };
+        // }
+
+        // var points = [];
+
+        // var circles = svg.selectAll("circle").data(points).enter()
+        // .append("circle")
+        // .attr("cx", function (d) { return xScale(d.x); })
+        // .attr("cy", function (d) { return yScale(d.y); })
+        // .attr("r", 2)
+        // .style("opacity", "0.3");
+
+        // Calculate the slope and intercept.
+          
+        // var model = {};
+
+        // var meanX = d3.mean(points, function(d){return d.x;});
+        // var meanY = d3.mean(points, function(d){return d.y;});
+
+        // model.slope = d3.sum(points, function(d){
+        //   return (d.x-meanX)*(d.y - meanY);
+        // });
+        // model.slope/= d3.sum(points, function(d){
+        //   return (d.x - meanX)*(d.x - meanX);
+        // });
+          
+        // model.intercept = meanY - model.slope * meanX;
+
+        // var regressionLine = svg.append("line")
+        // .attr("x1", xScale(-3))
+        // .attr("y1", yScale(model.slope * -3 + model.intercept))
+        // .attr("x2", xScale(3))
+        // .attr("y2", yScale(model.slope * 3 + model.intercept))
+        // .style("stroke", "#993333");
+       });
       </script>
 
     </div>
