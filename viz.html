@@ -268,7 +268,7 @@
         .y(function(d) {
             return yScale(d.raw_turb);
         })
-        .defined(function(d) { return !isNaN(d.raw_turb) & d.code == "ati"; });;  
+        .defined(function(d) { return !isNaN(d.raw_turb) ; });;  //& d.code == "ati"
 
         svg.append('g').append("path")
           //.data(data)
