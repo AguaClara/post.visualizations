@@ -1,0 +1,61 @@
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>Wash4All</title>
+
+  <!--  Scripts-->
+  
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/viz.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+  <nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="./index.html" class="brand-logo"> <span class="material-icons">language</span> OpenSourceWater</a>
+      <ul class="right hide-on-med-and-down">
+        <li ><a href="./about.html">About</a></li>
+        <li ><a href="./data.html">Data Downloads</a></li>
+        <li ><a href="./viz.html">Data Visualization</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="side-nav">
+        <li><a href="./about.html">About</a></li>
+        <li><a href="./data.html">Data Downloads</a></li>
+        <li><a href="./viz.html">Data Visualization</a></li>
+      </ul>
+
+      <script type="text/javascript">
+        $(function() {
+          // this will get the full URL at the address bar
+          var url = window.location.href;
+          $(".right.hide-on-med-and-down").each(function() {
+            // checks if its the same on the address bar
+            if (url == (this.href)) {
+              $(this).closest("li").addClass("active");
+            }
+          });
+          // passes on every "a" tag
+          $(".side-nav a").each(function() {
+            // checks if its the same on the address bar
+            if (url == (this.href)) {
+              $(this).closest("li").addClass("active");
+            }
+          });
+        });   
+      </script>
+
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <!--<h1 class="header center orange-text">Wash4All</h1>-->
+      <div class="row center">
+        <h5 class="header col s12 light">Monitor the performance of AguaClara plants in Honduras in real time!</h5>
+      </div>
