@@ -30,8 +30,11 @@
     <div class="section">
 
       <div id="visualizer"></div>
+      <div id="plot"></div>
 
       <script>
+      var colors; 
+
       var plantCoords = [
         {"lat": 14.446363, "longi" : -87.265564, "name":"Agalteca", "code":"aga"},
         {"lat": 13.852931, "longi" : -86.685029, "name":"Alauca","code":"ala"},
@@ -50,7 +53,7 @@
 
         //Colors for circle markers on map
         var selected = "blue";
-        var unselected = "maroon";
+        var unselected = "gray";
 
         var mapSVG = d3.select("#visualizer").append("svg")
             .attr("height",MAP_HEIGHT)
@@ -99,6 +102,7 @@
         });
 
         var selectedList = []; //list of currently chosen plants
+        var codeList = [];
 
         var circles = mapSVG.selectAll("circle").data(plantCoords).enter().append("circle")
           .attr("cx", function(coord){coords = projection([coord.longi, coord.lat]); return coords[0];})
@@ -118,26 +122,6 @@
           }
         });
 
-        circles.on("click", function(d){
-          //Add if we're selecting
-          if ($.inArray(this, selectedList)==-1){
-            selectedList.push(this);
-          }else{ //Delete if we're unselecting
-            var index = selectedList.indexOf(this);
-            selectedList.splice(index, 1);
-            d3.select(this).style("fill", unselected);
-          }
-          selectedList.forEach(function(d){
-            d3.select(d).style("fill", selected); //update colors
-          })
-
-        })
-      
-      </script>
-
-      <div id="plot"></div>
-
-      <script> 
       var data;
       d3.json("past_data.json", function(error, rows){
         data =rows;
@@ -149,6 +133,10 @@
         data = data.sort(sortByDateAscending);
 
         var height = 500;
+        // var width;
+        // if (screen.width<900){
+        //   width = screen.width-20;
+        // }else{ width = 880; }
         var width = 900;
         var plot_padding = 40;
 
@@ -191,25 +179,36 @@
         .y(function(d) {
             return yScale(d.raw_turb);
         })
-        .defined(function(d) { return !isNaN(d.raw_turb) ; });;  //& d.code == "ati"
+        .defined(function(d) { return !isNaN(d.raw_turb) ; });  //& d.code == "ati"
 
         //D3 Color Scale using 20 distinct colors
         var plantNames = [];
         plantData.forEach(
           function(d){plantNames.push(d.key);}
         );
-        var colors = d3.scale.category20()
+        colors = d3.scale.category20()
         .domain( plantNames );
 
-        console.log(colors);
         //Draw the line graph for each plant
-        plantData.forEach(function(plant){
-          svg.append('g').append("path")
-          .attr('d', lineGen(plant.values))
-          .attr('stroke', function(){return colors(plant.key);}) //Color corresponding to plant code
-          .attr('stroke-width', 2)
-          .attr('fill', 'none');
-        })
+        drawLines= function(codeList){
+          svg.selectAll("#linegraphline").remove();
+          plantData.forEach(function(plant){
+            //Check if this code was selected in order to draw it
+            plantCode = plant.values[0].code;
+            if ($.inArray(plantCode, codeList)>-1){
+              svg.append('g').append("path")
+              .attr('d', lineGen(plant.values))
+              .attr('stroke', function(){
+                return colors(plant.key); //Color corresponding to plant code
+              }) 
+              .attr('stroke-width', 2)
+              .attr('fill', 'none')
+              .attr("id", "linegraphline");
+            }
+          });
+        }
+
+        drawLines(codeList);
         
         // Code for making a linear regression.... not sure if we will use, but keeping anyway for now
         // ===============
@@ -252,6 +251,27 @@
         // .attr("y2", yScale(model.slope * 3 + model.intercept))
         // .style("stroke", "#993333");
        });
+
+
+      circles.on("click", function(d){
+          //Add if we're selecting
+          var code = this.getAttribute("code");
+          if ($.inArray(this, selectedList)==-1){
+            selectedList.push(this);
+            codeList.push(code);
+          }else{ //Delete if we're unselecting
+            var index = selectedList.indexOf(this);
+            selectedList.splice(index, 1);
+            index = codeList.indexOf(code);
+            codeList.splice(index, 1);
+            d3.select(this).style("fill", unselected);
+          }
+          drawLines(codeList); //update line graphs
+          selectedList.forEach(function(d){
+            d3.select(d).style("fill", colors(d.getAttribute("code"))); //update colors
+          })
+
+        })
       </script>
 
     </div>
