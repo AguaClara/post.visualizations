@@ -1,16 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+  
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>Wash4All</title>
+
+  <!--  Scripts-->
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
   <!--D3 -->
   <script src="js/d3.v3.min.js" charset="utf-8"></script>
   <script src="js/topojson.v1.min.js"></script> 
   <!--tooltip-->
   <script src="js/tip.js"></script>
-  <script src="js/jquery-2.1.1.min.js"></script>
-  <script> 
-    $(function(){
-      $("#headerContent").load("header.html"); 
-    });
-  </script> 
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/viz.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+
+<body>
+  <nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="./index.html" class="brand-logo"> <span class="material-icons">language</span> OpenSourceWater</a>
+    </div>
+  </nav>
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <!--<h1 class="header center orange-text">Wash4All</h1>-->
+      <div class="row center">
+        <h5 class="header col s12 light">Monitor the performance of AguaClara plants in Honduras in real time!</h5>
+      </div>
   <div id="headerContent"></div>
   <div class="container">
 
@@ -209,47 +232,6 @@
         }
 
         drawLines(codeList);
-        
-        // Code for making a linear regression.... not sure if we will use, but keeping anyway for now
-        // ===============
-        // function generateLinear(slope, intercept, noise) {
-        //   var x = gaussian();
-        //   var y = x * slope + intercept + noise * gaussian();
-          
-        //   return { x: x, y: y };
-        // }
-
-        // var points = [];
-
-        // var circles = svg.selectAll("circle").data(points).enter()
-        // .append("circle")
-        // .attr("cx", function (d) { return xScale(d.x); })
-        // .attr("cy", function (d) { return yScale(d.y); })
-        // .attr("r", 2)
-        // .style("opacity", "0.3");
-
-        // Calculate the slope and intercept.
-          
-        // var model = {};
-
-        // var meanX = d3.mean(points, function(d){return d.x;});
-        // var meanY = d3.mean(points, function(d){return d.y;});
-
-        // model.slope = d3.sum(points, function(d){
-        //   return (d.x-meanX)*(d.y - meanY);
-        // });
-        // model.slope/= d3.sum(points, function(d){
-        //   return (d.x - meanX)*(d.x - meanX);
-        // });
-          
-        // model.intercept = meanY - model.slope * meanX;
-
-        // var regressionLine = svg.append("line")
-        // .attr("x1", xScale(-3))
-        // .attr("y1", yScale(model.slope * -3 + model.intercept))
-        // .attr("x2", xScale(3))
-        // .attr("y2", yScale(model.slope * 3 + model.intercept))
-        // .style("stroke", "#993333");
        });
 
 
@@ -282,9 +264,26 @@
     </div>
   </div>
 
-  <script> 
-    $(function(){
-      $("#footerContent").load("footer.html"); 
-    });
-  </script> 
-  <div id="footerContent"></div>
+  <footer class="page-footer light-blue">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">About OpenSourceWater</h5>
+          <p class="grey-text text-lighten-4">Billions of people make do with unsafe water and inadequate sanitation treatment; development projects that aim to fix this frequently cost too much, achieve too little, and leave little or no public record. WASH for All is tracking the path towards universal access to water and sanitation by mapping the world’s knowledge of where these needs are unmet, who is working to meet them, and how.</p>
+
+
+        </div>
+        
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+      Made by <a class="light-blue-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+      </div>
+    </div>
+  </footer>
+
+
+
+  </body>
+</html>
