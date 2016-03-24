@@ -7,13 +7,11 @@
   <title>Wash4All</title>
 
   <!--  Scripts-->
+  <script src="js/jquery-2.1.1.min.js"></script>
   <script src="js/materialize.js"></script>
   <script src="js/init.js"></script>
   <!--D3 -->
   <script src="js/d3.v3.min.js" charset="utf-8"></script>
-  <script src="js/topojson.v1.min.js"></script> 
-  <!--tooltip-->
-  <script src="js/tip.js"></script>
 
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -32,14 +30,11 @@
       <br><br>
       <!--<h1 class="header center orange-text">Wash4All</h1>-->
       <div class="row center">
-        <h5 class="header col s12 light">Monitor the performance of AguaClara plants in Honduras in real time!</h5>
+        <h4>Morocelí Plant Data</h4>
+        <h5 class="header col s12 light">Select the types of data you would like to see visualized.</h5>
       </div>
   <div id="headerContent"></div>
   <div class="container">
-
-      <div class="row left">
-        <h4>Data Visualization</h4>
-      </div> 
 
       <div class="row center"> 
 
@@ -51,6 +46,16 @@
 
   <div class="container">
     <div class="section">
+      <form action=".">
+        <input type="checkbox" class="filled-in light-blue" id="rawturb" name="dtype" value="rawturb"/>
+          <label for="rawturb"><span class="checkboxtext">Raw turbidity</span></label><br/><br/>
+        <input type="checkbox" class="filled-in light-blue" id="effturb" name="dtype" value="effturb"/>
+          <label for="effturb"><span class="checkboxtext">Effluent turbidity</span></label><br/><br/>
+        <input type="checkbox" class="filled-in light-blue" id="coag" name="dtype" value="coag"/>
+          <label for="coag"><span class="checkboxtext">Coagulant dose</span></label><br/><br/>
+        <input type="checkbox" class="filled-in light-blue" id="flowrate" name="dtype" value="flowrate"/>
+          <label for="flowrate"><span class="checkboxtext">Flow rate (L/s)</span></label><br/><br/>
+      </form>
 
       <div id="visualizer"></div>
       <div id="plot"></div>
@@ -70,81 +75,8 @@
         {"lat": 15.000367, "longi" : -88.731957, "name":"San Nicolas", "code":"snic"},
         {"lat": 14.189934, "longi" : -87.331426, "name":"Tamara", "code":"tam"}
       ];
-
-        var MAP_HEIGHT = 400;
-        var MAP_WIDTH = 700;
-
-        //Colors for circle markers on map
-        var selected = "blue";
-        var unselected = "gray";
-
-        var mapSVG = d3.select("#visualizer").append("svg")
-            .attr("height",MAP_HEIGHT)
-            .attr("width", MAP_WIDTH)
-            .style("margin", "0 auto");
-
-        var g = mapSVG.append("g");
-        //place projection within bounds of the svg element
-        var projection = d3.geo.mercator().scale([5000]).translate([7900,1500]);
-        var path = d3.geo.path().projection(projection);
-
-        var coords; //will hold coordinate pairs in loop
-        var paddingText = 17; //offset my label text below map pins
-
-        //Create a tooltip which has this plant's name
-        tipcreate = function(){
-          var tip = d3.tip()
-          .attr('class', 'd3-tip')
-          .offset(function(d){if(d.lat>14.3){return [-25, 0];}else if(d.name=="Moroceli"){return [30,0];}else{return [25,0];}})
-          .direction(function(d){
-            if(d.lat<14.3){return 's';}else{return 'n';}
-          })
-          .html(function(d){if(d.name=="Jesus de Otoro"){return "Jesus<br/>&nbsp;&nbsp;&nbsp;de<br/>Otoro";}return d.name;});
-
-          mapSVG.call(tip);
-          return tip;
-        } 
-
-        //Each plant should have its own tooltip for multiselect
-        var toolTipArray = new Array(); 
-        plantCoords.forEach(function(d){toolTipArray[d.name] = tipcreate();});
-
-        d3.json("world-50m.json", function(error, world){
-          //create and color map
-          var countries = topojson.feature(world, world.objects.countries).features;
-          g.selectAll("path")
-          .data(countries)
-          .enter().append("path")
-          .attr("d", path)
-          .style("fill", function(country) {
-              // The data in the JSON file does not contain country names, only ISO-3166 numeric ids.
-              if (country.id === 340){ return "#E0E0EB"; } //Honduras
-              else{ return "white"; } 
-          })
-          .style("stroke", "white");
-        });
-
-        var selectedList = []; //list of currently chosen plants
-        var codeList = [];
-
-        var circles = mapSVG.selectAll("circle").data(plantCoords).enter().append("circle")
-          .attr("cx", function(coord){coords = projection([coord.longi, coord.lat]); return coords[0];})
-          .attr("cy", function(coord){coords = projection([coord.longi, coord.lat]); return coords[1];})
-          .attr("r", 7)
-          .attr("name", function(coord){return coord.name;})
-          .attr("code", function(coord){return coord.code;})
-          .style("fill", unselected);
-                  
-        circles.on("mouseover", function(d){
-          toolTipArray[d.name].show(d);
-        });
-
-        circles.on("mouseout", function(d){
-          if ($.inArray(this, selectedList)==-1){
-            toolTipArray[d.name].hide(d);
-          }
-        });
-
+   
+      var codeList = []; //list of currently chosen plants (by code)
       var data;
       d3.json("past_data.json", function(error, rows){
         data =rows;
@@ -155,12 +87,8 @@
         }
         data = data.sort(sortByDateAscending);
 
-        var height = 500;
-        // var width;
-        // if (screen.width<900){
-        //   width = screen.width-20;
-        // }else{ width = 880; }
-        var width = 900;
+        var height = 450;
+        var width = 350;//screen.width;
         var plot_padding = 40;
 
         var svg = d3.select("#plot").append("svg")
@@ -233,27 +161,6 @@
 
         drawLines(codeList);
        });
-
-
-      circles.on("click", function(d){
-          //Add if we're selecting
-          var code = this.getAttribute("code");
-          if ($.inArray(this, selectedList)==-1){
-            selectedList.push(this);
-            codeList.push(code);
-          }else{ //Delete if we're unselecting
-            var index = selectedList.indexOf(this);
-            selectedList.splice(index, 1);
-            index = codeList.indexOf(code);
-            codeList.splice(index, 1);
-            d3.select(this).style("fill", unselected);
-          }
-          drawLines(codeList); //update line graphs
-          selectedList.forEach(function(d){
-            d3.select(d).style("fill", colors(d.getAttribute("code"))); //update colors
-          })
-
-        })
       </script>
 
     </div>
