@@ -88,8 +88,10 @@
         data = data.sort(sortByDateAscending);
 
         var height = 450;
-        var width = 350;//screen.width;
-        var plot_padding = 40;
+        var width = screen.width; //350
+        var plot_padding = 20;
+        var plot_padding_left = 40;
+        var plot_padding_bottom = 62;
 
         var svg = d3.select("#plot").append("svg")
         .attr("height", height)
@@ -100,46 +102,61 @@
         var xMax = new Date(data[data.length -1].date_submitted);
         var xScale = d3.time.scale()
           .domain([xMin, xMax])
-          .range([plot_padding, width-plot_padding]);
+          .range([plot_padding_left, width-plot_padding]);
         
         var yScale = d3.scale.linear()
           .domain([0, d3.max(data, function (d) {return d.raw_turb; })])
-          .range([height-plot_padding, plot_padding]);
+          .range([height-plot_padding_bottom, plot_padding]);
 
-        var xAxis = d3.svg.axis().scale(xScale);
-        svg.append("g")
-          .attr("class", "axis")
-          .attr("transform", "translate("+0+", " + (height-plot_padding) + ")")
-          .call(xAxis);
-        xAxis.ticks(d3.time.weeks, 2)
+        var xAxis = d3.svg.axis()
+          .scale(xScale)
+          .orient("bottom");
           
-        var yAxis = d3.svg.axis().scale(yScale).orient("left");
         svg.append("g")
           .attr("class", "axis")
-          .attr("transform", "translate(" + plot_padding + ", "+ 0+")")
-          .call(yAxis);
+          .attr("transform", "translate("+0+", " + (height-plot_padding_bottom) + ")")
+          .call(xAxis)
+          .selectAll("text")  
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", function(d) {
+                return "rotate(-65)" 
+                });;
+
+          
+        var yAxis0 = d3.svg.axis().scale(yScale).orient("left");
+        svg.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(" + plot_padding_left + ", "+ 0+")")
+          .call(yAxis0);
 
         //Sort array by plant
         var plantData = d3.nest()
           .key(function(d) { return d.code; })
           .entries(data);
 
-        var lineGen = d3.svg.line()
-        .x(function(d) {
-            return xScale(new Date(d.date_submitted));
-        })
-        .y(function(d) {
-            return yScale(d.raw_turb);
-        })
-        .defined(function(d) { return !isNaN(d.raw_turb) ; });  //& d.code == "ati"
+        /* attrName = str of the thing to visualize, e.g. "raw_turb"
+           plantData = nested plant data, sorted into groups by plants
+        */
+        lineGen = function(attrName, plantData){
+          d3.svg.line()
+          .x(function(d) {
+              return xScale(new Date(d.date_submitted));
+          })
+          .y(function(d) {
+              return yScale(d.attr(attrName));
+          })
+          .defined(function(d) { return !isNaN(d.attr(attrName)); });  //& d.code == "ati"
 
-        //D3 Color Scale using 20 distinct colors
-        var plantNames = [];
-        plantData.forEach(
-          function(d){plantNames.push(d.key);}
-        );
-        colors = d3.scale.category20()
-        .domain( plantNames );
+          //D3 Color Scale using 20 distinct colors
+          var plantNames = [];
+          plantData.forEach(
+            function(d){plantNames.push(d.key);}
+          );
+          colors = d3.scale.category20()
+          .domain( plantNames );
+        }
 
         //Draw the line graph for each plant
         drawLines= function(codeList){
