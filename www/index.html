@@ -22,7 +22,7 @@
 
 <body>
   <nav class="light-blue lighten-1" role="navigation">
-    <div class="nav-wrapper container"><a id="logo-container" href="./index.html" class="brand-logo"> <span class="material-icons">language</span> OpenSourceWater</a>
+    <div class="nav-wrapper container"><a id="logo-container" href="./index.html" class="brand-logo">OpenSourceWater</a>
     </div>
   </nav>
   <div class="section no-pad-bot" id="index-banner">
@@ -47,14 +47,14 @@
   <div class="container">
     <div class="section">
       <form action=".">
-        <input type="checkbox" class="filled-in light-blue" id="rawturb" name="dtype" value="rawturb"/>
-          <label for="rawturb"><span class="checkboxtext">Raw turbidity</span></label><br/><br/>
-        <input type="checkbox" class="filled-in light-blue" id="effturb" name="dtype" value="effturb"/>
-          <label for="effturb"><span class="checkboxtext">Effluent turbidity</span></label><br/><br/>
-        <input type="checkbox" class="filled-in light-blue" id="coag" name="dtype" value="coag"/>
-          <label for="coag"><span class="checkboxtext">Coagulant dose</span></label><br/><br/>
-        <input type="checkbox" class="filled-in light-blue" id="flowrate" name="dtype" value="flowrate"/>
-          <label for="flowrate"><span class="checkboxtext">Flow rate (L/s)</span></label><br/><br/>
+        <input type="checkbox" class="filled-in" id="raw_turb" name="dtype" value="raw_turb"/>
+          <label for="raw_turb"><span class="checkboxtext">Raw turbidity</span></label><br/><br/>
+        <input type="checkbox" class="filled-in" id="settled_turb" name="dtype" value="settled_turb"/>
+          <label for="settled_turb"><span class="checkboxtext">Effluent turbidity</span></label><br/><br/>
+        <input type="checkbox" class="filled-in" id="coagulant" name="dtype" value="coagulant"/>
+          <label for="coagulant"><span class="checkboxtext">Coagulant dose</span></label><br/><br/>
+        <input type="checkbox" class="filled-in" id="flow_rate" name="dtype" value="flow_rate"/>
+          <label for="flow_rate"><span class="checkboxtext">Flow rate (L/s)</span></label><br/><br/>
       </form>
 
       <div id="visualizer"></div>
@@ -111,6 +111,7 @@
           .attr("class", "axis")
           .attr("transform", "translate("+0+", " + (height-plot_padding) + ")")
           .call(xAxis);
+        xAxis.ticks(d3.time.weeks, 2)
           
         var yAxis = d3.svg.axis().scale(yScale).orient("left");
         svg.append("g")
