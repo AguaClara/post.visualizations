@@ -76,11 +76,14 @@
         {"lat": 14.189934, "longi" : -87.331426, "name":"Tamara", "code":"tam"}
       ];
    
-      var codeList = []; //list of currently chosen plants (by code)
+      //Hardcoded to just be Morocli for now...
+      var codeList = ["moro"]; //list of currently chosen plants (by code)
       var data;
+
       d3.json("past_data.json", function(error, rows){
         data =rows;
 
+        /* Sort input data by date*/
         function sortByDateAscending(a, b) {
             // Dates will be cast to numbers automagically:
             return new Date(a.date_submitted) - new Date(b.date_submitted);
@@ -88,7 +91,7 @@
         data = data.sort(sortByDateAscending);
 
         var height = 450;
-        var width = screen.width; //350
+        var width = 290;
         var plot_padding = 20;
         var plot_padding_left = 40;
         var plot_padding_bottom = 62;
@@ -97,6 +100,8 @@
         .attr("height", height)
         .attr("width", width);
 
+
+        /* Create and draw axes ................................................*/
         //Can take first and last because they are already sorted
         var xMin = new Date(data[0].date_submitted);
         var xMax = new Date(data[data.length -1].date_submitted);
@@ -124,13 +129,14 @@
                 return "rotate(-65)" 
                 });;
 
-          
         var yAxis0 = d3.svg.axis().scale(yScale).orient("left");
         svg.append("g")
           .attr("class", "axis")
           .attr("transform", "translate(" + plot_padding_left + ", "+ 0+")")
           .call(yAxis0);
 
+
+        /* Sort and display data ...............................................*/
         //Sort array by plant
         var plantData = d3.nest()
           .key(function(d) { return d.code; })
@@ -158,15 +164,19 @@
           .domain( plantNames );
         }
 
-        //Draw the line graph for each plant
+        /*
+         * Draw the line graph for each plant with code in codelist
+         */
         drawLines= function(codeList){
+          attr_name = "raw_turb"; //TODO not be hardcoded
+
           svg.selectAll("#linegraphline").remove();
           plantData.forEach(function(plant){
             //Check if this code was selected in order to draw it
             plantCode = plant.values[0].code;
             if ($.inArray(plantCode, codeList)>-1){
               svg.append('g').append("path")
-              .attr('d', lineGen(plant.values))
+              .attr('d', lineGen(attr_name, plant.values))
               .attr('stroke', function(){
                 return colors(plant.key); //Color corresponding to plant code
               }) 
