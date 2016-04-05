@@ -47,7 +47,7 @@
   <div class="container">
     <div class="section">
       <form action=".">
-        <input type="checkbox" class="filled-in" id="raw_turb" name="dtype" value="raw_turb"/>
+        <input type="checkbox" class="filled-in" id="raw_turb" name="dtype" value="raw_turb" checked/>
           <label for="raw_turb"><span class="checkboxtext">Raw turbidity</span></label><br/><br/>
         <input type="checkbox" class="filled-in" id="settled_turb" name="dtype" value="settled_turb"/>
           <label for="settled_turb"><span class="checkboxtext">Effluent turbidity</span></label><br/><br/>
@@ -61,6 +61,32 @@
       <div id="plot"></div>
 
       <script>
+
+      $(document).ready(function() {
+
+       $(".filled-in").on("click", function() {
+          var matches = [];
+          $(".filled-in:checked").each(function() {
+              matches.push(this.value);
+          });
+
+          console.log(matches);
+          if (matches.length == 2){
+            $(".filled-in").attr("disabled", true);
+            matches.forEach(function(m){
+              $("#"+m).attr("disabled", false);
+            })
+            
+          }else if (matches.length < 2){
+            $(".filled-in").attr("disabled", false);
+          }
+
+        });
+
+      });
+
+      
+
       var colors; 
 
       var plantCoords = [
@@ -104,19 +130,18 @@
         });
 
         //D3 Color Scale using 20 distinct colors
-        var plantNames = [];
-        plantData.forEach(
-          function(d){plantNames.push(d.key);}
-        );
-        colors = d3.scale.category20()
-        .domain( plantNames );
+        //Get the 11 dimensions
+        var dataFields = Object.keys(plantDataDict[Object.keys(plantDataDict)[0]][0]);
+        dataFields.splice(0,0); //Assumes pid is first and gets rid of it
+        colors = d3.scale.category10().domain( dataFields );
 
         /* Create plot .........................................................*/
         var height = 350;
         var width = 290;
-        var plot_padding = 20;
+        var plot_padding_right = 40;
         var plot_padding_left = 40;
         var plot_padding_bottom = 62;
+        var plot_padding_top = 20;
 
         var svg = d3.select("#plot").append("svg")
           .attr("height", height)
@@ -131,12 +156,12 @@
           var xMax = new Date(data[data.length -1].date_submitted);
           xScale = d3.time.scale()
             .domain([xMin, xMax])
-            .range([plot_padding_left, width-plot_padding]);
+            .range([plot_padding_left, width-plot_padding_right]);
           return xScale;
         }
 
         drawXAxis = function(xScale){
-          xAxis = d3.svg.axis()
+          var xAxis = d3.svg.axis()
             .scale(xScale)
             .orient("bottom");
             
@@ -154,25 +179,30 @@
         }
 
         makeYScale = function(data, attr_name){
-          yScale = d3.scale.linear()
+          var yScale = d3.scale.linear()
             .domain([0, d3.max(data, function (d) {return d[attr_name]; })])
-            .range([height-plot_padding_bottom, plot_padding]);
+            .range([height-plot_padding_bottom, plot_padding_top]);
           return yScale;
         }
 
         drawYAxis = function(yScale){
-          yAxis = d3.svg.axis().scale(yScale).orient("left");
+          var yAxis = d3.svg.axis().scale(yScale).orient("left");
           svg.append("g")
             .attr("class", "axis")
             .attr("transform", "translate(" + plot_padding_left + ", "+ 0+")")
             .call(yAxis);
         }
 
-        
+        drawSecondYAxis = function(yScale){
+          var yAxis = d3.svg.axis().scale(yScale).orient("right");
+          svg.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(" + (width - plot_padding_right) + ", "+ 0+")")
+            .call(yAxis);
+        }
 
         /* Make the line graph .................................................*/
-
-        function drawLines(xScale, yScale, attr_name){
+        function drawLines(data, xScale, yScale, attr_name, codeList){
           var lineGen = d3.svg.line()
             .x(function(d) {
                 return xScale(new Date(d.date_submitted));
@@ -184,32 +214,56 @@
               return !isNaN(d[attr_name]); 
             });  
     
-            //Draw the line graph for each plant with code in codelist
-            svg.selectAll("#linegraphline").remove();
-            plantData.forEach(function(plant){
-              //Check if this code was selected in order to draw it
-              plantCode = plant.values[0].code;
+          //Draw the line graph for each plant with code in codelist
+          svg.selectAll("#linegraphline"+attr_name).remove();
 
-              if ($.inArray(plantCode, codeList)>-1){
-                svg.append('g').append("path")
-                  .attr('d', lineGen(plant.values))
-                  .attr('stroke', function(){
-                    return colors(plant.key); //Color corresponding to plant code
-                  }) 
-                  .attr('stroke-width', 2)
-                  .attr('fill', 'none')
-                  .attr("id", "linegraphline");
-              }
-            });
-          }       
+          //Check if this code was selected in order to draw it
+          plantCode = data[0].code;
 
-      xScale = makeXScale(plantDataDict["moro"]);
-      drawXAxis(xScale);
-      yScale = makeYScale(plantDataDict["moro"], "raw_turb");
-      drawYAxis(yScale);
-      drawLines(xScale, yScale, "raw_turb");
+          if ($.inArray(plantCode, codeList)>-1){
+            svg.append('g').append("path")
+              .attr('d', lineGen(data))
+              .attr('stroke', function(){
+                return colors(attr_name); 
+              }) 
+              .attr('stroke-width', 2)
+              .attr('fill', 'none')
+              .attr("id", "linegraphline"+attr_name);
+          }
+      }       
+
+      /* code = 
+       * selectedList = len 1 or 2 of checkboxes that have been checked
+       */
+      function drawPlot(code, selectedList){
+        if (selectedList.length>=1){
+          attr1 = selectedList[0];
+
+          xScale = makeXScale(plantDataDict[code]);
+          drawXAxis(xScale);
+          
+          yScale = makeYScale(plantDataDict[code], attr1);
+          drawYAxis(yScale);
+          drawLines(plantDataDict[code], xScale, yScale, attr1, codeList);
+          
+          //Double axes part of plot
+          if (selectedList.length==2){
+            attr2 = selectedList[1];
+            yScale2 = makeYScale(plantDataDict[code], attr2);
+            drawSecondYAxis(yScale2);
+            drawLines(plantDataDict[code], xScale, yScale2, attr2, codeList);
+          }
+        }
+      }
       
+      drawPlot("moro", ["raw_turb", "settled_turb"]);
+      
+      //Wouldn't it be cool if they could sweep a vertical bar over the data and 
+      //see what the exact values were?
        });
+    
+
+      
       </script>
 
     </div>
