@@ -153,12 +153,9 @@
                   });
         }
 
-        xScale = makeXScale(plantDataDict["moro"]);
-        drawXAxis(xScale);
-
         makeYScale = function(data, attr_name){
           yScale = d3.scale.linear()
-            .domain([0, 5])//d3.max(data, function (d) {return d[attr_name]; })])
+            .domain([0, d3.max(data, function (d) {return d[attr_name]; })])
             .range([height-plot_padding_bottom, plot_padding]);
           return yScale;
         }
@@ -171,7 +168,7 @@
             .call(yAxis);
         }
 
-        yScale = makeYScale(plantDataDict["moro"], "raw_turb");
+        
 
         /* Make the line graph .................................................*/
 
@@ -206,6 +203,10 @@
             });
           }       
 
+      xScale = makeXScale(plantDataDict["moro"]);
+      drawXAxis(xScale);
+      yScale = makeYScale(plantDataDict["moro"], "raw_turb");
+      drawYAxis(yScale);
       drawLines(xScale, yScale, "raw_turb");
       
        });
