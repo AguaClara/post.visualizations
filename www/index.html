@@ -76,118 +76,138 @@
         {"lat": 14.189934, "longi" : -87.331426, "name":"Tamara", "code":"tam"}
       ];
    
-      //Hardcoded to just be Morocli for now...
+      //Hardcoded to just be Moroceli for now...
       var codeList = ["moro"]; //list of currently chosen plants (by code)
       var data;
 
       d3.json("past_data.json", function(error, rows){
         data =rows;
 
-        /* Sort input data by date*/
+        /* Sort input data by date .............................................*/
         function sortByDateAscending(a, b) {
             // Dates will be cast to numbers automagically:
             return new Date(a.date_submitted) - new Date(b.date_submitted);
         }
         data = data.sort(sortByDateAscending);
 
-        var height = 450;
+        /* Nest and display data ...............................................*/
+        
+        //Sort array by plant
+        var plantData = d3.nest()
+          .key(function(d) { return d.code; })
+          .entries(data);
+
+        //Associative array
+        var plantDataDict = {};
+        plantData.forEach(function(plant){
+          plantDataDict[plant.key] = plant.values;
+        });
+
+        //D3 Color Scale using 20 distinct colors
+        var plantNames = [];
+        plantData.forEach(
+          function(d){plantNames.push(d.key);}
+        );
+        colors = d3.scale.category20()
+        .domain( plantNames );
+
+        /* Create plot .........................................................*/
+        var height = 350;
         var width = 290;
         var plot_padding = 20;
         var plot_padding_left = 40;
         var plot_padding_bottom = 62;
 
         var svg = d3.select("#plot").append("svg")
-        .attr("height", height)
-        .attr("width", width);
-
+          .attr("height", height)
+          .attr("width", width);
 
         /* Create and draw axes ................................................*/
-        //Can take first and last because they are already sorted
-        var xMin = new Date(data[0].date_submitted);
-        var xMax = new Date(data[data.length -1].date_submitted);
-        var xScale = d3.time.scale()
-          .domain([xMin, xMax])
-          .range([plot_padding_left, width-plot_padding]);
-        
-        var yScale = d3.scale.linear()
-          .domain([0, d3.max(data, function (d) {return d.raw_turb; })])
-          .range([height-plot_padding_bottom, plot_padding]);
+        var xScale; var yScale; var xAxis; var yAxis0;
 
-        var xAxis = d3.svg.axis()
-          .scale(xScale)
-          .orient("bottom");
-          
-        svg.append("g")
-          .attr("class", "axis")
-          .attr("transform", "translate("+0+", " + (height-plot_padding_bottom) + ")")
-          .call(xAxis)
-          .selectAll("text")  
-            .style("text-anchor", "end")
-            .attr("dx", "-.8em")
-            .attr("dy", ".15em")
-            .attr("transform", function(d) {
-                return "rotate(-65)" 
-                });;
-
-        var yAxis0 = d3.svg.axis().scale(yScale).orient("left");
-        svg.append("g")
-          .attr("class", "axis")
-          .attr("transform", "translate(" + plot_padding_left + ", "+ 0+")")
-          .call(yAxis0);
-
-
-        /* Sort and display data ...............................................*/
-        //Sort array by plant
-        var plantData = d3.nest()
-          .key(function(d) { return d.code; })
-          .entries(data);
-
-        /* attrName = str of the thing to visualize, e.g. "raw_turb"
-           plantData = nested plant data, sorted into groups by plants
-        */
-        lineGen = function(attrName, plantData){
-          d3.svg.line()
-          .x(function(d) {
-              return xScale(new Date(d.date_submitted));
-          })
-          .y(function(d) {
-              return yScale(d.attr(attrName));
-          })
-          .defined(function(d) { return !isNaN(d.attr(attrName)); });  //& d.code == "ati"
-
-          //D3 Color Scale using 20 distinct colors
-          var plantNames = [];
-          plantData.forEach(
-            function(d){plantNames.push(d.key);}
-          );
-          colors = d3.scale.category20()
-          .domain( plantNames );
+        makeXScale = function(data){
+          //Can take first and last because they are already sorted
+          var xMin = new Date(data[0].date_submitted);
+          var xMax = new Date(data[data.length -1].date_submitted);
+          xScale = d3.time.scale()
+            .domain([xMin, xMax])
+            .range([plot_padding_left, width-plot_padding]);
+          return xScale;
         }
 
-        /*
-         * Draw the line graph for each plant with code in codelist
-         */
-        drawLines= function(codeList){
-          attr_name = "raw_turb"; //TODO not be hardcoded
-
-          svg.selectAll("#linegraphline").remove();
-          plantData.forEach(function(plant){
-            //Check if this code was selected in order to draw it
-            plantCode = plant.values[0].code;
-            if ($.inArray(plantCode, codeList)>-1){
-              svg.append('g').append("path")
-              .attr('d', lineGen(attr_name, plant.values))
-              .attr('stroke', function(){
-                return colors(plant.key); //Color corresponding to plant code
-              }) 
-              .attr('stroke-width', 2)
-              .attr('fill', 'none')
-              .attr("id", "linegraphline");
-            }
-          });
+        drawXAxis = function(xScale){
+          xAxis = d3.svg.axis()
+            .scale(xScale)
+            .orient("bottom");
+            
+          svg.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate("+0+", " + (height-plot_padding_bottom) + ")")
+            .call(xAxis)
+            .selectAll("text")  
+              .style("text-anchor", "end")
+              .attr("dx", "-.8em")
+              .attr("dy", ".15em")
+              .attr("transform", function(d) {
+                  return "rotate(-65)" 
+                  });
         }
 
-        drawLines(codeList);
+        xScale = makeXScale(plantDataDict["moro"]);
+        drawXAxis(xScale);
+
+        makeYScale = function(data, attr_name){
+          yScale = d3.scale.linear()
+            .domain([0, 5])//d3.max(data, function (d) {return d[attr_name]; })])
+            .range([height-plot_padding_bottom, plot_padding]);
+          return yScale;
+        }
+
+        drawYAxis = function(yScale){
+          yAxis = d3.svg.axis().scale(yScale).orient("left");
+          svg.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(" + plot_padding_left + ", "+ 0+")")
+            .call(yAxis);
+        }
+
+        yScale = makeYScale(plantDataDict["moro"], "raw_turb");
+
+        /* Make the line graph .................................................*/
+
+        function drawLines(xScale, yScale, attr_name){
+          var lineGen = d3.svg.line()
+            .x(function(d) {
+                return xScale(new Date(d.date_submitted));
+            })
+            .y(function(d) {
+                return yScale(d[attr_name]);
+            })
+            .defined(function(d) { 
+              return !isNaN(d[attr_name]); 
+            });  
+    
+            //Draw the line graph for each plant with code in codelist
+            svg.selectAll("#linegraphline").remove();
+            plantData.forEach(function(plant){
+              //Check if this code was selected in order to draw it
+              plantCode = plant.values[0].code;
+
+              if ($.inArray(plantCode, codeList)>-1){
+                svg.append('g').append("path")
+                  .attr('d', lineGen(plant.values))
+                  .attr('stroke', function(){
+                    return colors(plant.key); //Color corresponding to plant code
+                  }) 
+                  .attr('stroke-width', 2)
+                  .attr('fill', 'none')
+                  .attr("id", "linegraphline");
+              }
+            });
+          }       
+
+      drawLines(xScale, yScale, "raw_turb");
+      
        });
       </script>
 
