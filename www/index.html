@@ -47,13 +47,13 @@
   <div class="container">
     <div class="section">
       <form action=".">
-        <input type="checkbox" class="filled-in" id="raw_turb" name="dtype" value="raw_turb" checked/>
+        <input type="checkbox" class="filled-in" id="raw_turb" name="dtype" value="raw_turb" checked />
           <label for="raw_turb"><span class="checkboxtext">Raw turbidity</span></label><br/><br/>
-        <input type="checkbox" class="filled-in" id="settled_turb" name="dtype" value="settled_turb"/>
+        <input type="checkbox" class="filled-in" id="settled_turb" name="dtype" value="settled_turb" />
           <label for="settled_turb"><span class="checkboxtext">Effluent turbidity</span></label><br/><br/>
-        <input type="checkbox" class="filled-in" id="coagulant" name="dtype" value="coagulant"/>
+        <input type="checkbox" class="filled-in" id="coagulant" name="dtype" value="coagulant"  />
           <label for="coagulant"><span class="checkboxtext">Coagulant dose</span></label><br/><br/>
-        <input type="checkbox" class="filled-in" id="flow_rate" name="dtype" value="flow_rate"/>
+        <input type="checkbox" class="filled-in" id="flow_rate" name="dtype" value="flow_rate"  />
           <label for="flow_rate"><span class="checkboxtext">Flow rate (L/s)</span></label><br/><br/>
       </form>
 
@@ -61,29 +61,6 @@
       <div id="plot"></div>
 
       <script>
-
-      $(document).ready(function() {
-
-       $(".filled-in").on("click", function() {
-          var matches = [];
-          $(".filled-in:checked").each(function() {
-              matches.push(this.value);
-          });
-
-          console.log(matches);
-          if (matches.length == 2){
-            $(".filled-in").attr("disabled", true);
-            matches.forEach(function(m){
-              $("#"+m).attr("disabled", false);
-            })
-            
-          }else if (matches.length < 2){
-            $(".filled-in").attr("disabled", false);
-          }
-
-        });
-
-      });
 
       
 
@@ -132,7 +109,7 @@
         //D3 Color Scale using 20 distinct colors
         //Get the 11 dimensions
         var dataFields = Object.keys(plantDataDict[Object.keys(plantDataDict)[0]][0]);
-        dataFields.splice(0,0); //Assumes pid is first and gets rid of it
+        dataFields.splice(0,1); //Assumes pid is first and gets rid of it
         colors = d3.scale.category10().domain( dataFields );
 
         /* Create plot .........................................................*/
@@ -197,6 +174,7 @@
           var yAxis = d3.svg.axis().scale(yScale).orient("right");
           svg.append("g")
             .attr("class", "axis")
+            .attr("id", "secondaxis")
             .attr("transform", "translate(" + (width - plot_padding_right) + ", "+ 0+")")
             .call(yAxis);
         }
@@ -236,6 +214,9 @@
        * selectedList = len 1 or 2 of checkboxes that have been checked
        */
       function drawPlot(code, selectedList){
+        svg.selectAll(".axis").remove();
+        svg.selectAll("path").remove();
+
         if (selectedList.length>=1){
           attr1 = selectedList[0];
 
@@ -256,7 +237,29 @@
         }
       }
       
-      drawPlot("moro", ["raw_turb", "settled_turb"]);
+      drawPlot("moro", ["raw_turb"]);
+
+      $(document).ready(function() {
+        var matches = ["raw_turb"];
+        $(".filled-in").on("click", function() {
+          if ($.inArray(this.value, matches)==-1){
+            matches.push(this.value);
+          }else{
+            ind = matches.indexOf(this.value);
+            matches.splice(ind,1);
+          }
+          
+          if (matches.length == 3){
+            removed = matches.shift();
+            $(".filled-in").prop("checked", false);
+
+          }  
+          matches.forEach(function(m){
+            $('#'+m).prop("checked", true);
+            drawPlot("moro", matches);
+          });        
+        });
+      });
       
       //Wouldn't it be cool if they could sweep a vertical bar over the data and 
       //see what the exact values were?
