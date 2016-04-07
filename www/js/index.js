@@ -221,6 +221,9 @@ drawPlot("moro", ["raw_turb"]);
 
 $(document).ready(function() {
   var matches = ["raw_turb"];
+  $("#first_name").on("change", function(){
+    
+  })
   $(".filled-in").on("click", function() {
     if ($.inArray(this.value, matches)==-1){
       matches.push(this.value);
