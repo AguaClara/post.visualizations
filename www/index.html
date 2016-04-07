@@ -47,14 +47,22 @@
   <div class="container">
     <div class="section">
       <form action=".">
+        <div class="cb_pad">
         <input type="checkbox" class="filled-in" id="raw_turb" name="dtype" value="raw_turb" checked />
           <label for="raw_turb"><span class="checkboxtext">Raw turbidity</span></label><br/>
+        </div>
+        <div class="cb_pad">
         <input type="checkbox" class="filled-in" id="settled_turb" name="dtype" value="settled_turb" />
           <label for="settled_turb"><span class="checkboxtext">Settled turbidity</span></label><br/>
+        </div>
+        <div class="cb_pad">
         <input type="checkbox" class="filled-in" id="coagulant" name="dtype" value="coagulant"  />
           <label for="coagulant"><span class="checkboxtext">Coagulant dose</span></label><br/>
+        </div>
+        <div class="cb_pad">
         <input type="checkbox" class="filled-in" id="flow_rate" name="dtype" value="flow_rate"  />
           <label for="flow_rate"><span class="checkboxtext">Flow rate (L/s)</span></label><br/>
+        </div>
       </form>
 
       <div id="visualizer"></div>
