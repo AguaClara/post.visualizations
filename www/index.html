@@ -48,13 +48,13 @@
     <div class="section">
       <form action=".">
         <input type="checkbox" class="filled-in" id="raw_turb" name="dtype" value="raw_turb" checked />
-          <label for="raw_turb"><span class="checkboxtext">Raw turbidity</span></label><br/><br/>
+          <label for="raw_turb"><span class="checkboxtext">Raw turbidity</span></label><br/>
         <input type="checkbox" class="filled-in" id="settled_turb" name="dtype" value="settled_turb" />
-          <label for="settled_turb"><span class="checkboxtext">Effluent turbidity</span></label><br/><br/>
+          <label for="settled_turb"><span class="checkboxtext">Effluent turbidity</span></label><br/>
         <input type="checkbox" class="filled-in" id="coagulant" name="dtype" value="coagulant"  />
-          <label for="coagulant"><span class="checkboxtext">Coagulant dose</span></label><br/><br/>
+          <label for="coagulant"><span class="checkboxtext">Coagulant dose</span></label><br/>
         <input type="checkbox" class="filled-in" id="flow_rate" name="dtype" value="flow_rate"  />
-          <label for="flow_rate"><span class="checkboxtext">Flow rate (L/s)</span></label><br/><br/>
+          <label for="flow_rate"><span class="checkboxtext">Flow rate (L/s)</span></label><br/>
       </form>
 
       <div id="visualizer"></div>
@@ -78,6 +78,20 @@
         {"lat": 15.000367, "longi" : -88.731957, "name":"San Nicolas", "code":"snic"},
         {"lat": 14.189934, "longi" : -87.331426, "name":"Tamara", "code":"tam"}
       ];
+
+      var units = {
+       "raw_turb":"NTU",
+       "settled_turb":"NTU",
+       "coagulant":"mg/L",
+       "flow_rate":"L/s",
+      };
+
+      var prettyNames = {
+       "raw_turb":"Raw Turbidity",
+       "settled_turb":"Settled Turbidity",
+       "coagulant":"Coagulant",
+       "flow_rate":"Flow Rate",
+      };
    
       //Hardcoded to just be Moroceli for now...
       var codeList = ["moro"]; //list of currently chosen plants (by code)
@@ -115,8 +129,8 @@
         /* Create plot .........................................................*/
         var height = 350;
         var width = 290;
-        var plot_padding_right = 40;
-        var plot_padding_left = 40;
+        var plot_padding_right = 42;
+        var plot_padding_left = 42;
         var plot_padding_bottom = 62;
         var plot_padding_top = 20;
 
@@ -153,6 +167,12 @@
               .attr("transform", function(d) {
                   return "rotate(-65)" 
                   });
+          svg.append("text")
+            .attr("class", "x label")
+            .attr("text-anchor", "middle")
+            .attr("x", (width- plot_padding_left - plot_padding_right)/2.0 + plot_padding_left)
+            .attr("y", height - 6)
+            .text("Time");
         }
 
         makeYScale = function(data, attr_name){
@@ -162,21 +182,36 @@
           return yScale;
         }
 
-        drawYAxis = function(yScale){
+        drawYAxis = function(yScale, attr_name){
           var yAxis = d3.svg.axis().scale(yScale).orient("left");
           svg.append("g")
             .attr("class", "axis")
             .attr("transform", "translate(" + plot_padding_left + ", "+ 0+")")
             .call(yAxis);
+
+          svg.append("text")
+            .attr("class", "y label 1")
+            .attr("text-anchor", "middle")
+            .attr("dy", ".75em")
+            .attr("transform", "rotate(-90) translate("+ (-(height - plot_padding_top - plot_padding_bottom)/2.0 - plot_padding_top) +" 3)")
+            
+            .text( prettyNames[attr_name] + " (" + units[attr_name] + ")");
         }
 
-        drawSecondYAxis = function(yScale){
+        drawSecondYAxis = function(yScale, attr_name){
           var yAxis = d3.svg.axis().scale(yScale).orient("right");
           svg.append("g")
             .attr("class", "axis")
             .attr("id", "secondaxis")
             .attr("transform", "translate(" + (width - plot_padding_right) + ", "+ 0+")")
             .call(yAxis);
+
+          svg.append("text")
+            .attr("class", "y label 2")
+            .attr("text-anchor", "middle")
+            .attr("dy", ".75em")
+            .attr("transform", "rotate(-270) translate( "+((height - plot_padding_bottom - plot_padding_top)/2.0 + plot_padding_top) +" "+(-width+3)+")")
+            .text( prettyNames[attr_name] + " (" + units[attr_name] + ")");
         }
 
         /* Make the line graph .................................................*/
@@ -216,22 +251,33 @@
       function drawPlot(code, selectedList){
         svg.selectAll(".axis").remove();
         svg.selectAll("path").remove();
+        svg.selectAll("text").remove();
+
+        xScale = makeXScale(plantDataDict[code]);
+        drawXAxis(xScale);
 
         if (selectedList.length>=1){
           attr1 = selectedList[0];
 
-          xScale = makeXScale(plantDataDict[code]);
-          drawXAxis(xScale);
-          
-          yScale = makeYScale(plantDataDict[code], attr1);
-          drawYAxis(yScale);
+          if (selectedList.length==2 && selectedList[0].substr(selectedList[0].length - 4) == "turb"
+              && (selectedList[1].substr(selectedList[1].length - 4) == "turb")){
+            yScale = makeYScale(plantDataDict[code], 'raw_turb');
+          }else{
+            yScale = makeYScale(plantDataDict[code], attr1);
+          }
+          drawYAxis(yScale, attr1);
           drawLines(plantDataDict[code], xScale, yScale, attr1, codeList);
           
           //Double axes part of plot
           if (selectedList.length==2){
             attr2 = selectedList[1];
-            yScale2 = makeYScale(plantDataDict[code], attr2);
-            drawSecondYAxis(yScale2);
+            if (selectedList[0].substr(selectedList[0].length - 4) == "turb"
+              && (selectedList[1].substr(selectedList[1].length - 4) == "turb")){
+              yScale2 = makeYScale(plantDataDict[code], 'raw_turb');
+            }else{
+              yScale2 = makeYScale(plantDataDict[code], attr2);
+            }
+            drawSecondYAxis(yScale2, attr2);
             drawLines(plantDataDict[code], xScale, yScale2, attr2, codeList);
           }
         }
@@ -256,8 +302,9 @@
           }  
           matches.forEach(function(m){
             $('#'+m).prop("checked", true);
-            drawPlot("moro", matches);
-          });        
+            
+          });
+          drawPlot("moro", matches);
         });
       });
       

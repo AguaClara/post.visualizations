@@ -1,5 +1,5 @@
 svg { 
-	border: solid black 1px; 
+	/*border: solid black 1px; */
 }
 
 .bar rect { 
@@ -25,7 +25,7 @@ svg {
 }
 
 .checkboxtext{
-  font-size: 1.7em;
+  font-size: 1.3em;
   color:black;
 }
 
