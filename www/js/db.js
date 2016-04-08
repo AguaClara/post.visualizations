@@ -7,7 +7,7 @@
 $(document).ready(onDeviceReady())
 function onDeviceReady() {
 	deleteOldPlantData();
-	updatePlantData();
+	// updatePlantData(console.log);
 }
 
 // Inserts a list of plant data records into local storage
@@ -17,14 +17,18 @@ function insertManyPlantData(plantData) {
 	}
 }
 
+// Get all the local plant data. If there is no plant data locally, this will return null.
 function retrieveAllPlantData() {
 	var maxKey = localStorage.getItem('maxKey');
 	var minKey = localStorage.getItem('minKey');
 	var plantData = [];
 	for (i = minKey; i < maxKey; i++) {
-		plantData[i-minKey]=localStorage.getItem(i);
+		plantData[i-minKey]=JSON.parse(localStorage.getItem(i));
 	}
-	return plantData
+}
+
+function load(key) {
+	localStorage.getItem(key);
 }
 
 // Put the plant data record into storage
@@ -39,6 +43,8 @@ function initializeMetaStats(json) {
 	localStorage.setItem('plantName', plantName);
 	localStorage.setItem('minKey', json[0].pid);
 	localStorage.setItem('maxKey', json[json.length-1].pid);
+	localStorage.setItem('minDate', json[0].date_submitted);
+	localStorage.setItem('maxDate', json[json.length-1].date_submitted);
 }
 function writeMetaStats(json) {
 	var minKey = localStorage.getItem('minKey');
@@ -50,13 +56,17 @@ function writeMetaStats(json) {
 	}
 }
 
-function updatePlantData(latestPlantDataKey){
+// Asynchronous function to download plant data and store it locally. Input callback function.
+function updatePlantData(onSuccess){
 	$.getJSON("past_data_shortened.json", function(json) {
 		insertManyPlantData(json);
 		writeMetaStats(json);
+		onSuccess(json)
 	});
 }
 
 //TODO Functions
-function askForPlantName(){};
+function askForPlantName(){
+	return 'moro'
+};
 function deleteOldPlantData(){};
