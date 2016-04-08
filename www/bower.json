@@ -1,0 +1,26 @@
+{
+  "name": "POST Viz",
+  "homepage": "https://github.com/ethan92429/post.visualizations",
+  "authors": [
+    "ethan92429 <ethan.keller@gmail.com>"
+  ],
+  "description": "The POST visualizations app that runs on phonegap",
+  "main": "bower",
+  "moduleType": [],
+  "keywords": [
+    "visualization",
+    "phonegap"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "persistence": "^0.3.0"
+  }
+}
