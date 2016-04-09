@@ -25,6 +25,7 @@ function retrieveAllPlantData() {
 	for (i = minKey; i < maxKey; i++) {
 		plantData[i-minKey]=JSON.parse(localStorage.getItem(i));
 	}
+	return plantData
 }
 
 function load(key) {
