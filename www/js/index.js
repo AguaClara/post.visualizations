@@ -40,13 +40,17 @@ var plot_padding_right = 42;
 var plot_padding_left = 42;
 var plot_padding_bottom = 62;
 var plot_padding_top = 20;
+/* Create and draw axes ................................................*/
+var xScale; var yScale; var xAxis; var yAxis0;
+var xMin;
+var xMax;
 
 // Attempt to get the data stored locally
 function getData(onSuccess) {
   // Try to get locally
   data = retrieveAllPlantData();
   // If not locally stored, prompt the user? Maybe check date and say "data since xx/xx/xxxx displayed?"
-  if (data == null) {
+  if (data.length == 0) {
     updatePlantData(onSuccess);
   }
 }
@@ -77,9 +81,6 @@ function visualize(data) {
     .attr("height", height)
     .attr("width", width);
 
-  /* Create and draw axes ................................................*/
-  var xScale; var yScale; var xAxis; var yAxis0;
-
   drawPlot("moro", ["raw_turb"]);
 }
 
@@ -91,8 +92,8 @@ function sortByDateAscending(a, b) {
 
 makeXScale = function(data){
   //Can take first and last because they are already sorted
-  var xMin = new Date(data[0].date_submitted);
-  var xMax = new Date(data[data.length-1].date_submitted);
+  xMin = new Date(data[0].date_submitted);
+  xMax = new Date(data[data.length-1].date_submitted);
   xScale = d3.time.scale()
     .domain([xMin, xMax])
     .range([plot_padding_left, width-plot_padding_right]);
