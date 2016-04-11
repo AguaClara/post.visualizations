@@ -45,14 +45,16 @@ var xScale; var yScale; var xAxis; var yAxis0;
 var xMin;
 var xMax;
 
-// Attempt to get the data stored locally
+// Attempt to get the data stored locally. onSuccess should take in a list 
+// of JSON objects that contain all the data needed
 function getData(onSuccess) {
   // Try to get locally
   data = retrieveAllPlantData();
   // If not locally stored, prompt the user? Maybe check date and say "data since xx/xx/xxxx displayed?"
   if (data.length == 0) {
-    updatePlantData(onSuccess);
+    updatePlantData(function(json) {data = json; onSuccess(data)});
   }
+  else onSuccess(data);
 }
 
 function visualize(data) {
