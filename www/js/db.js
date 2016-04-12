@@ -22,7 +22,9 @@ function load(key) {
 	localStorage.getItem(key);
 }
 
-// Asynchronous function to download plant data and store it locally. Input callback function.
+// Asynchronous function to download plant data and store it locally. Input callback function. 
+// TODO: Return an 
+// error dialog if the update failed for whatever reason, and leave the local storage untouched.
 function updatePlantData(onSuccess){
 	$.getJSON("past_data.json", function(json) {
 		insertManyPlantData(json);
@@ -73,6 +75,10 @@ function writeMetaStats(json) {
 }
 
 //TODO Functions
+
+// Asynchronous function to update the locally stored plant data. 
+function checkForUpdate(){}
+
 function askForPlantName(){
 	return 'moro'
 };
