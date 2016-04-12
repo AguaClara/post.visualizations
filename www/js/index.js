@@ -56,10 +56,28 @@ function getData(onSuccess) {
   }
   else onSuccess(data);
 }
+ 
+function settable(data){
+          var tabledata = data;
+          var currenttime = new Date("2016-02-03");
+          var datebound = new Date(currenttime.setDate(currenttime.getDate()-7));
+          var table = d3.select("#table").append("table");
+          var entry = data.pop();
+          var roll = table.append("tr");
+          for(var i in entry){
+            roll.append("th").html(i);
+          }
+          while(new Date(entry.date_submitted)>datebound){
+            roll =  table.append("tr");
+            for(var i in entry){
+              roll.append("td").html(entry[i]);
+            }
+            entry = tabledata.pop();
+          }
+        }
 
 function visualize(data) {
-  // data =rows;
-  console.log(data)
+  // data =rows;    
   data = data.sort(sortByDateAscending);
   /* Nest and display data ...............................................*/
 
@@ -84,6 +102,7 @@ function visualize(data) {
     .attr("width", width);
 
   drawPlot("moro", ["raw_turb"]);
+  settable(data);
 }
 
 /* Sort input data by date .............................................*/
