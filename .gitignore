@@ -1,5 +1,5 @@
 # cordova
-platforms/
+platforms/*
 
 # jekyll
 _site
