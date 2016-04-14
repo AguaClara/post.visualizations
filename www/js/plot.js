@@ -18,13 +18,14 @@ var units = {
  "settledWaterTurbidity":"NTU",
  "coagulantDose":"mg/L",
  "flowRate":"L/s",
+ "filteredWaterTurbidity":"NTU"
 };
 
-var prettyNames = {
+var dataTypes = {
  "rawWaterTurbidity":"Raw Turbidity",
  "settledWaterTurbidity":"Settled Turbidity",
- "coagulantDose":"Coagulant",
- "flowRate":"Flow Rate",
+ "filteredWaterTurbidity":"Filtered Turbidity",
+ "coagulantDose":"Coagulant" 
 };
 
 //Hardcoded to just be Moroceli for now...
@@ -32,7 +33,8 @@ var codeList = ["Moroceli"]; //list of currently chosen plants (by code)
 
 var data;
 var svg;
-var plantDataDict = {};
+var matches; //Currently selected checkboxes
+
 /* Create plot .........................................................*/
 var height = 350;
 var width = 290;
@@ -40,10 +42,29 @@ var plot_padding_right = 42;
 var plot_padding_left = 42;
 var plot_padding_bottom = 62;
 var plot_padding_top = 20;
+
 /* Create and draw axes ................................................*/
 var xScale; var yScale; var xAxis; var yAxis0;
 var xMin;
 var xMax;
+
+//Add togglable checkboxes to page
+function makeCheckboxes(){
+  selected = "";
+  var formText = "<form action='.'>";
+  check = true;
+  for(var key in dataTypes){
+    val = dataTypes[key];
+    formText+='<div class="cb_pad"><input type="checkbox" class="filled-in" id="'+key+'" name="dtype" value="'+key+'"';
+    if (check){formText+=" checked";check=false; selected = key;} //Check the first item just to demonstrate
+    formText+='/><label for="'+key+'"><span class="checkboxtext">'+val+'</span></label><br/></div>';
+  };
+  formText += "</div></form>";
+
+  $(".checkboxesForm").html(formText);
+  return selected;
+}
+
 
 // Attempt to get the data stored locally. onSuccess should take in a list 
 // of JSON objects that contain all the data needed
@@ -56,59 +77,25 @@ function getData(onSuccess) {
   }
   else onSuccess(data);
 }
- 
-function settable(data){
-          var tabledata = data;
-          var currenttime = new Date("2016-02-03");
-          var datebound = new Date(currenttime.setDate(currenttime.getDate()-7));
-          var table = d3.select("#table").append("table");
-          var entry = data.pop();
-          var roll = table.append("tr");
-          for(var i in entry){
-            roll.append("th").html(i);
-          }
-          while(new Date(entry.date_submitted)>datebound){
-            roll =  table.append("tr");
-            for(var i in entry){
-              roll.append("td").html(entry[i]);
-            }
-            entry = tabledata.pop();
-          }
-        }
 
-function visualize(data) {
-  // data =rows;    
+function visualize(data) {   
   data = data.sort(sortByDateAscending);
-  /* Nest and display data ...............................................*/
 
-  //Sort array by plant
-  var plantData = d3.nest()
-    .key(function(d) { return d.plant; })
-    .entries(data);
-
-  //Associative array
-  plantData.forEach(function(plant){
-    plantDataDict[plant.key] = plant.values;
-  });
-
-  //D3 Color Scale using 20 distinct colors
-  //Get the 11 dimensions
-  var dataFields = Object.keys(plantDataDict[Object.keys(plantDataDict)[0]][0]);
-  dataFields.splice(0,1); //Assumes pid is first and gets rid of it
-  colors = d3.scale.category10().domain( dataFields );
+  colors = d3.scale.category10().domain( Object.keys(dataTypes) );
 
   svg = d3.select("#plot").append("svg")
     .attr("height", height)
-    .attr("width", width);
+    .attr("width", width);  
 
-  drawPlot("Moroceli", ["rawWaterTurbidity"]);
-  settable(data);
+  preSelectedItem = makeCheckboxes();
+  matches = [preSelectedItem];
+  drawPlot(data.filter(function(elem){return elem[preSelectedItem] != null;}), "Moroceli", matches);
 }
 
 /* Sort input data by date .............................................*/
 function sortByDateAscending(a, b) {
   // Dates will be cast to numbers automagically:
-  return new Date(a.date_submitted) - new Date(b.date_submitted);
+  return new Date(a.timeStarted) - new Date(b.timeStarted);
 }
 
 makeXScale = function(data){
@@ -165,7 +152,7 @@ drawYAxis = function(yScale, attr_name){
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90) translate("+ (-(height - plot_padding_top - plot_padding_bottom)/2.0 - plot_padding_top) +" 3)")
     
-    .text( prettyNames[attr_name] + " (" + units[attr_name] + ")");
+    .text( dataTypes[attr_name] + " (" + units[attr_name] + ")");
 }
 
 drawSecondYAxis = function(yScale, attr_name){
@@ -181,7 +168,7 @@ drawSecondYAxis = function(yScale, attr_name){
     .attr("text-anchor", "middle")
     .attr("dy", ".75em")
     .attr("transform", "rotate(-270) translate( "+((height - plot_padding_bottom - plot_padding_top)/2.0 + plot_padding_top) +" "+(-width+3)+")")
-    .text( prettyNames[attr_name] + " (" + units[attr_name] + ")");
+    .text( dataTypes[attr_name] + " (" + units[attr_name] + ")");
 }
 
 /* Make the line graph .................................................*/
@@ -194,7 +181,7 @@ function drawLines(data, xScale, yScale, attr_name, codeList){
         return yScale(d[attr_name]);
     })
     .defined(function(d) { 
-      return !isNaN(d[attr_name]); 
+      return !isNaN(d[attr_name]) && d[attr_name]!=null; 
     });  
 
   //Draw the line graph for each plant with code in codelist
@@ -203,9 +190,11 @@ function drawLines(data, xScale, yScale, attr_name, codeList){
   //Check if this code was selected in order to draw it
   plantCode = data[0].plant;
 
+  filtered = data.filter(function(elem){return elem[attr_name] != null;})
+  
   if ($.inArray(plantCode, codeList)>-1){
     svg.append('g').append("path")
-      .attr('d', lineGen(data))
+      .attr('d', lineGen(filtered))
       .attr('stroke', function(){
         return colors(attr_name); 
       }) 
@@ -215,48 +204,70 @@ function drawLines(data, xScale, yScale, attr_name, codeList){
   }
 }       
 
+//if the same units, we want to know so we can use the same scale
+//codelist has two items and they are the same
+function isSameUnits(codelist, units){
+  return codelist.length==2 && units[codelist[0]]==units[codelist[1]];
+}
+
+//return the name of the field that has the larger scale
+function hasMaxScale(data, codelist){
+  max1 = d3.max(data, function (d) {return d[codelist[0]]; });
+  max2 = d3.max(data, function (d) {return d[codelist[1]]; });
+  if(max1 > max2){return codelist[0];} return codelist[1];
+}
+
 /* code = 
  * selectedList = len 1 or 2 of checkboxes that have been checked
  */
-function drawPlot(code, selectedList){
+function drawPlot(data, code, selectedList){
   svg.selectAll(".axis").remove();
   svg.selectAll("path").remove();
   svg.selectAll("text").remove();
 
-  xScale = makeXScale(plantDataDict[code]);
+  xScale = makeXScale(data);
   drawXAxis(xScale);
 
-  if (selectedList.length>=1){
+  //Both selected are in the same units. Standardize the scale
+  if (isSameUnits(selectedList, units)){
+    attr1 = selectedList[0];
+    attr2 = selectedList[1];
+    maxField = hasMaxScale(data, selectedList); //ID of the scale with the larger range.
+    
+    yScale = makeYScale(data, maxField); 
+    drawYAxis(yScale, attr1);
+    drawLines(data, xScale, yScale, attr1, codeList);
+
+    yScale2 = makeYScale(data, maxField);
+    drawSecondYAxis(yScale2, attr2);
+    drawLines(data, xScale, yScale2, attr2, codeList);
+  }
+  // Different units, so keep whatever scale the unit has alone
+  else if (selectedList.length>=1){
     attr1 = selectedList[0];
 
-    if (selectedList.length==2 && selectedList[0].substr(selectedList[0].length - 4) == "turb"
-        && (selectedList[1].substr(selectedList[1].length - 4) == "turb")){
-      yScale = makeYScale(plantDataDict[code], 'rawWaterTurbidity');
-    }else{
-      yScale = makeYScale(plantDataDict[code], attr1);
-    }
+    yScale = makeYScale(data, attr1);
     drawYAxis(yScale, attr1);
-    drawLines(plantDataDict[code], xScale, yScale, attr1, codeList);
-    
-    //Double axes part of plot
+    drawLines(data, xScale, yScale, attr1, codeList);
+
     if (selectedList.length==2){
       attr2 = selectedList[1];
-      if (selectedList[0].substr(selectedList[0].length - 4) == "turb"
-        && (selectedList[1].substr(selectedList[1].length - 4) == "turb")){
-        yScale2 = makeYScale(plantDataDict[code], 'rawWaterTurbidity');
-      }else{
-        yScale2 = makeYScale(plantDataDict[code], attr2);
-      }
+
+      yScale2 = makeYScale(data, attr2);
       drawSecondYAxis(yScale2, attr2);
-      drawLines(plantDataDict[code], xScale, yScale2, attr2, codeList);
+      drawLines(data, xScale, yScale2, attr2, codeList);
     }
   }
 }
 
 
-$(document).ready(function() {
+//with callbakc 
+//updatePlantData();
+
+
+$(document).ready(function() { 
   getData(visualize);
-  var matches = ["rawWaterTurbidity"];
+
   $(".filled-in").on("click", function() {
     if ($.inArray(this.value, matches)==-1){
       matches.push(this.value);
@@ -269,12 +280,14 @@ $(document).ready(function() {
       removed = matches.shift();
       $(".filled-in").prop("checked", false);
 
-    }  
+    } 
+    filtered = data; 
     matches.forEach(function(m){
       $('#'+m).prop("checked", true);
-      
+      filtered = filtered.filter(function(elem){return elem[m] != null;})
     });
-    drawPlot("Moroceli", matches);
+
+    drawPlot(filtered, "Moroceli", matches);
   });
 });
 

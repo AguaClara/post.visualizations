@@ -14,7 +14,8 @@
   <script src="js/d3.v3.min.js" charset="utf-8"></script>
   <!-- Custom Scripts -->
   <script src="js/db.js"></script>
-  <script src="js/index.js"></script>
+  <script src="js/plot.js"></script>
+  <script src="js/table.js"></script>
 
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -55,35 +56,13 @@
   <div class="container">
     <div class="section">
       <div class="checkboxesForm"></div>
-      <script>
-        var dataTypes = {
-         "raw_turb":"Raw Turbidity",
-         "settled_turb":"Settled Turbidity",
-         "filtered_turb":"Filtered Turbidity",
-         "coagulant":"Coagulant"         
-        };
 
-        var formText = "<form action='.'>";
-        check = true;
-        for(var key in dataTypes){
-          val = dataTypes[key];
-          formText+='<div class="cb_pad"><input type="checkbox" class="filled-in" id="'+key+'" name="dtype" value="'+key+'"';
-          if (check){formText+=" checked";check=false; } //Check the first item just to demonstrate
-          formText+='/><label for="'+key+'"><span class="checkboxtext">'+val+'</span></label><br/></div>';
-        };
-        formText += "</div></form>";
-
-        $(".checkboxesForm").html(formText);
-      </script>
-
-    <div id="visualizer"></div>
-    <div id="plot"></div>
+      <div id="visualizer"></div>
+      <div id="plot"></div>
 
     </div>
     <br><br>
-
     <div class="section">
-
     </div>
     <div class="section" id ="table">
 
