@@ -8,11 +8,9 @@
 
 // Get all the local plant data. If there is no plant data locally, this will return an empty list.
 function retrieveAllPlantData() {
-	var maxKey = localStorage.getItem('maxKey');
-	var minKey = localStorage.getItem('minKey');
 	var plantData = [];
-	for (i = minKey; i < maxKey; i++) {
-		plantData[i-minKey]=JSON.parse(localStorage.getItem(i));
+	for ( var i = 0, len = localStorage.length-3; i < len; ++i ) {
+  	 plantData[i] = JSON.parse(localStorage.getItem( localStorage.key( i ) ) );
 	}
 	return plantData
 }
@@ -26,7 +24,7 @@ function load(key) {
 // TODO: Return an 
 // error dialog if the update failed for whatever reason, and leave the local storage untouched.
 function updatePlantData(onSuccess){
-	$.getJSON("past_data.json", function(json) {
+	$.getJSON("Datos_v1_2_results.json", function(json) {
 		insertManyPlantData(json);
 		writeMetaStats(json);
 		onSuccess(json)
@@ -51,7 +49,7 @@ function insertManyPlantData(plantData) {
 
 // Put the plant data record into storage
 function setPlantDataRecord(plantDataRecord) {
-	localStorage.setItem(plantDataRecord.pid, JSON.stringify(plantDataRecord));
+	localStorage.setItem(plantDataRecord.timeStarted, JSON.stringify(plantDataRecord));
 }
 
 // MetaStats is an object that will store all of the persistent data, such as 
@@ -59,18 +57,16 @@ function setPlantDataRecord(plantDataRecord) {
 function initializeMetaStats(json) {
 	var plantName = askForPlantName();
 	localStorage.setItem('plantName', plantName);
-	localStorage.setItem('minKey', json[0].pid);
-	localStorage.setItem('maxKey', json[json.length-1].pid);
 	localStorage.setItem('minDate', json[0].date_submitted);
 	localStorage.setItem('maxDate', json[json.length-1].date_submitted);
 }
 function writeMetaStats(json) {
-	var minKey = localStorage.getItem('minKey');
-	if (minKey == null) {
+	var minDate = localStorage.getItem('minDate');
+	if (minDate == null) {
 		initializeMetaStats(json);
 	}
 	else {
-		localStorage.setItem('maxKey', json[json.length-1].pid);
+		localStorage.setItem('minDate', json[json.length-1].timeStarted);
 	}
 }
 
@@ -80,6 +76,6 @@ function writeMetaStats(json) {
 function checkForUpdate(){}
 
 function askForPlantName(){
-	return 'moro'
+	return 'Moroceli'
 };
 function deleteOldPlantData(){};

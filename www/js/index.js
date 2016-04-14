@@ -14,21 +14,21 @@ var plantCoords = [
 ];
 
 var units = {
- "raw_turb":"NTU",
- "settled_turb":"NTU",
- "coagulant":"mg/L",
- "flow_rate":"L/s",
+ "rawWaterTurbidity":"NTU",
+ "settledWaterTurbidity":"NTU",
+ "coagulantDose":"mg/L",
+ "flowRate":"L/s",
 };
 
 var prettyNames = {
- "raw_turb":"Raw Turbidity",
- "settled_turb":"Settled Turbidity",
- "coagulant":"Coagulant",
- "flow_rate":"Flow Rate",
+ "rawWaterTurbidity":"Raw Turbidity",
+ "settledWaterTurbidity":"Settled Turbidity",
+ "coagulantDose":"Coagulant",
+ "flowRate":"Flow Rate",
 };
 
 //Hardcoded to just be Moroceli for now...
-var codeList = ["moro"]; //list of currently chosen plants (by code)
+var codeList = ["Moroceli"]; //list of currently chosen plants (by code)
 
 var data;
 var svg;
@@ -83,7 +83,7 @@ function visualize(data) {
 
   //Sort array by plant
   var plantData = d3.nest()
-    .key(function(d) { return d.code; })
+    .key(function(d) { return d.plant; })
     .entries(data);
 
   //Associative array
@@ -101,7 +101,7 @@ function visualize(data) {
     .attr("height", height)
     .attr("width", width);
 
-  drawPlot("moro", ["raw_turb"]);
+  drawPlot("Moroceli", ["rawWaterTurbidity"]);
   settable(data);
 }
 
@@ -113,8 +113,8 @@ function sortByDateAscending(a, b) {
 
 makeXScale = function(data){
   //Can take first and last because they are already sorted
-  xMin = new Date(data[0].date_submitted);
-  xMax = new Date(data[data.length-1].date_submitted);
+  xMin = new Date(data[0].timeStarted);
+  xMax = new Date(data[data.length-1].timeStarted);
   xScale = d3.time.scale()
     .domain([xMin, xMax])
     .range([plot_padding_left, width-plot_padding_right]);
@@ -188,7 +188,7 @@ drawSecondYAxis = function(yScale, attr_name){
 function drawLines(data, xScale, yScale, attr_name, codeList){
   var lineGen = d3.svg.line()
     .x(function(d) {
-        return xScale(new Date(d.date_submitted));
+        return xScale(new Date(d.timeStarted));
     })
     .y(function(d) {
         return yScale(d[attr_name]);
@@ -201,7 +201,7 @@ function drawLines(data, xScale, yScale, attr_name, codeList){
   svg.selectAll("#linegraphline"+attr_name).remove();
 
   //Check if this code was selected in order to draw it
-  plantCode = data[0].code;
+  plantCode = data[0].plant;
 
   if ($.inArray(plantCode, codeList)>-1){
     svg.append('g').append("path")
@@ -231,7 +231,7 @@ function drawPlot(code, selectedList){
 
     if (selectedList.length==2 && selectedList[0].substr(selectedList[0].length - 4) == "turb"
         && (selectedList[1].substr(selectedList[1].length - 4) == "turb")){
-      yScale = makeYScale(plantDataDict[code], 'raw_turb');
+      yScale = makeYScale(plantDataDict[code], 'rawWaterTurbidity');
     }else{
       yScale = makeYScale(plantDataDict[code], attr1);
     }
@@ -243,7 +243,7 @@ function drawPlot(code, selectedList){
       attr2 = selectedList[1];
       if (selectedList[0].substr(selectedList[0].length - 4) == "turb"
         && (selectedList[1].substr(selectedList[1].length - 4) == "turb")){
-        yScale2 = makeYScale(plantDataDict[code], 'raw_turb');
+        yScale2 = makeYScale(plantDataDict[code], 'rawWaterTurbidity');
       }else{
         yScale2 = makeYScale(plantDataDict[code], attr2);
       }
@@ -256,7 +256,7 @@ function drawPlot(code, selectedList){
 
 $(document).ready(function() {
   getData(visualize);
-  var matches = ["raw_turb"];
+  var matches = ["rawWaterTurbidity"];
   $(".filled-in").on("click", function() {
     if ($.inArray(this.value, matches)==-1){
       matches.push(this.value);
@@ -274,7 +274,7 @@ $(document).ready(function() {
       $('#'+m).prop("checked", true);
       
     });
-    drawPlot("moro", matches);
+    drawPlot("Moroceli", matches);
   });
 });
 
