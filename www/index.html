@@ -54,26 +54,27 @@
 
   <div class="container">
     <div class="section">
-      <form action=".">
-        <div class="cb_pad">
-        <input type="checkbox" class="filled-in" id="raw_turb" name="dtype" value="raw_turb" checked />
-          <label for="raw_turb"><span class="checkboxtext">Raw turbidity</span></label><br/>
-        </div>
-        <div class="cb_pad">
-        <input type="checkbox" class="filled-in" id="settled_turb" name="dtype" value="settled_turb" />
-          <label for="settled_turb"><span class="checkboxtext">Settled turbidity</span></label><br/>
-        </div>
-        <div class="cb_pad">
-        <input type="checkbox" class="filled-in" id="coagulant" name="dtype" value="coagulant"  />
-          <label for="coagulant"><span class="checkboxtext">Coagulant dose</span></label><br/>
-        </div>
-        <div class="cb_pad">
-        <input type="checkbox" class="filled-in" id="flow_rate" name="dtype" value="flow_rate"  />
-          <label for="flow_rate"><span class="checkboxtext">Flow rate (L/s)</span></label><br/>
-        </div>
-        <div class="cb_pad">
-        </div>
-      </form>
+      <div class="checkboxesForm"></div>
+      <script>
+        var dataTypes = {
+         "raw_turb":"Raw Turbidity",
+         "settled_turb":"Settled Turbidity",
+         "filtered_turb":"Filtered Turbidity",
+         "coagulant":"Coagulant"         
+        };
+
+        var formText = "<form action='.'>";
+        check = true;
+        for(var key in dataTypes){
+          val = dataTypes[key];
+          formText+='<div class="cb_pad"><input type="checkbox" class="filled-in" id="'+key+'" name="dtype" value="'+key+'"';
+          if (check){formText+=" checked";check=false; } //Check the first item just to demonstrate
+          formText+='/><label for="'+key+'"><span class="checkboxtext">'+val+'</span></label><br/></div>';
+        };
+        formText += "</div></form>";
+
+        $(".checkboxesForm").html(formText);
+      </script>
 
     <div id="visualizer"></div>
     <div id="plot"></div>
