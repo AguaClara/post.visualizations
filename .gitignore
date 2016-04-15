@@ -3,3 +3,5 @@ platforms/*
 
 # jekyll
 _site
+
+*.DS_Store
