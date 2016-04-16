@@ -61,11 +61,17 @@ function makeCheckboxes(){
   };
   formText += "</div></form>";
 
+  $(".checkboxesForm").empty();
   $(".checkboxesForm").html(formText);
   return selected;
 }
 
-function visualize(data) {   
+// visualize function sorts the data and redraws the plot. To be used when the localStorage is updated. 
+function visualize(data) { 
+  // empty any previous plot
+  $('#plot').empty();
+
+  // sort data by type
   data = data.sort(sortByDateAscending);
 
   colors = d3.scale.category10().domain( Object.keys(dataTypes) );
@@ -77,6 +83,7 @@ function visualize(data) {
   preSelectedItem = makeCheckboxes();
   matches = [preSelectedItem];
   drawPlot(data.filter(function(elem){return elem[preSelectedItem] != null;}), "Moroceli", matches);
+  respondToCheckBox();
 }
 
 /* Sort input data by date .............................................*/
@@ -247,19 +254,7 @@ function drawPlot(data, code, selectedList){
   }
 }
 
-
-//with callbakc 
-//updatePlantData();
-
-
-$(document).ready(function() { 
-  connectSyncButton();
-
-  data = retrieveAllPlantData();
-  if (data.length > 0) {
-    visualize(data)
-  }
-    
+function respondToCheckBox(){
   $(".filled-in").on("click", function() {
     if ($.inArray(this.value, matches)==-1){
       matches.push(this.value);
@@ -281,6 +276,20 @@ $(document).ready(function() {
 
     drawPlot(filtered, "Moroceli", matches);
   });
+}
+
+
+//with callbakc 
+//updatePlantData();
+
+
+$(document).ready(function() { 
+  connectSyncButton();
+
+  data = retrieveAllPlantData();
+  if (data.length > 0) {
+    visualize(data)
+  }
 });
 
 //Wouldn't it be cool if they could sweep a vertical bar over the data and 
