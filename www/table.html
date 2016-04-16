@@ -14,13 +14,22 @@
   <script src="js/d3.v3.min.js" charset="utf-8"></script>
   <!-- Custom Scripts -->
   <script src="js/db.js"></script>
-  <script src="js/plot.js"></script>
+  <script src="js/table.js"></script>
 
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="css/viz.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <!--Style the table border-->
+  <style>
+  table {
+    border-collapse: collapse;
+  }
+  table, th, td {
+    border: 1px solid #022D4C;
+    }
+  </style>
 </head>
 
 <body>
@@ -28,12 +37,12 @@
     <div class="nav-wrapper container"><a id="logo-container" href="./index.html" class="brand-logo">OpenSourceWater</a>
       <ul class="right hide-on-med-and-down">
         <li ><a href="./">Graphs</a></li>
-        <li ><a href="./table.html">Tables</a></li>
+        <li ><a href="table.html">Tables</a></li>
       </ul>
 
       <ul id="nav-mobile" class="side-nav">
         <li ><a href="./">Graphs</a></li>
-        <li ><a href="./table.html">Tables</a></li>
+        <li ><a href="table.html">Tables</a></li>
       </ul>
     </div>
   </nav>
@@ -43,7 +52,7 @@
       <!--<h1 class="header center orange-text">Wash4All</h1>-->
       <div class="row center">
         <h4>Morocelí Plant Data</h4>
-        <h5 class="header col s12 light">Select the types of data you would like to see visualized.</h5>
+        <h5 class="header col s12 light">A table that displays data from the past 7 days</h5>
         <a id='sync' class="waves-effect waves-light btn">Sync Data</a>
       </div>
   <div id="headerContent"></div>
@@ -54,15 +63,9 @@
   </div>
 
   <div class="container">
-    <div class="section">
-      <div class="checkboxesForm"></div>
+  
+    <div class="section" id ="table">
 
-      <div id="visualizer"></div>
-      <div id="plot"></div>
-
-    </div>
-    <br><br>
-    <div class="section">
     </div>
   </div>
 
