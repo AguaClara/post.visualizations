@@ -65,19 +65,6 @@ function makeCheckboxes(){
   return selected;
 }
 
-
-// Attempt to get the data stored locally. onSuccess should take in a list 
-// of JSON objects that contain all the data needed
-function getData(onSuccess) {
-  // Try to get locally
-  data = retrieveAllPlantData();
-  // If not locally stored, prompt the user? Maybe check date and say "data since xx/xx/xxxx displayed?"
-  if (data.length == 0) {
-    updatePlantData(function(json) {data = json; onSuccess(data)});
-  }
-  else onSuccess(data);
-}
-
 function visualize(data) {   
   data = data.sort(sortByDateAscending);
 
@@ -266,8 +253,13 @@ function drawPlot(data, code, selectedList){
 
 
 $(document).ready(function() { 
-  getData(visualize);
+  connectSyncButton();
 
+  data = retrieveAllPlantData();
+  if (data.length > 0) {
+    visualize(data)
+  }
+    
   $(".filled-in").on("click", function() {
     if ($.inArray(this.value, matches)==-1){
       matches.push(this.value);

@@ -20,24 +20,36 @@ function load(key) {
 	localStorage.getItem(key);
 }
 
+// Load any string from local storage.
+function save(key, value) {
+	localStorage.setItem(key, value);
+}
+
 // Asynchronous function to download plant data and store it locally. Input callback function. 
-// TODO: Return an 
-// error dialog if the update failed for whatever reason, and leave the local storage untouched.
-function updatePlantData(onSuccess){
+// The onSuccess(data) function must take in an array of data objects.
+// TODO: onFailure. 
+function updatePlantData(onSuccess, onFailure){
 	$.getJSON("Datos_v1_2_results.json", function(json) {
 		insertManyPlantData(json);
 		writeMetaStats(json);
 		onSuccess(json)
+	})
+	.fail(function() {
+		alert('Could not connect to the internet. Data sync was not successful.')
+		onFailure();
 	});
 }
 
 // ----------------------------------------Private Methods/script------------------------------------------
 // This part of the script is used internally. 
 
-// Start everything up
-$(document).ready(onDeviceReady())
-function onDeviceReady() {
-	deleteOldPlantData();
+
+function connectSyncButton() {
+	$('#sync').click(function() {
+		// alert('Are you sure you want to sync the data? You must be connected to the internet!')
+		// deleteOldPlantData();
+		updatePlantData(visualize,function(){});
+	});
 }
 
 // Inserts a list of plant data records into local storage
@@ -78,4 +90,8 @@ function checkForUpdate(){}
 function askForPlantName(){
 	return 'Moroceli'
 };
-function deleteOldPlantData(){};
+function deleteOldPlantData(){
+	plantName = load('plantName')
+	localStorage.clear();
+	save('plantName',plantName)
+};
