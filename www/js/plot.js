@@ -278,6 +278,12 @@ function respondToCheckBox(){
   });
 }
 
+function initViz(){
+  data = retrieveAllPlantData();
+  if (data.length > 0) {
+    visualize(data)
+  }
+}
 
 //with callbakc 
 //updatePlantData();
@@ -285,11 +291,8 @@ function respondToCheckBox(){
 
 $(document).ready(function() { 
   connectSyncButton();
+  initViz();
 
-  data = retrieveAllPlantData();
-  if (data.length > 0) {
-    visualize(data)
-  }
 });
 
 //Wouldn't it be cool if they could sweep a vertical bar over the data and 
