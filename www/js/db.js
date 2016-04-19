@@ -29,7 +29,7 @@ function save(key, value) {
 // The onSuccess(data) function must take in an array of data objects.
 // TODO: onFailure. 
 function updatePlantData(onSuccess, onFailure){
-	$.getJSON("Datos_v1_2_results.json", function(json) {
+	$.getJSON("data/Datos_v1_2_results.json", function(json) {
 		localStorage.clear();
 		insertManyPlantData(json);
 		writeMetaStats(json);
