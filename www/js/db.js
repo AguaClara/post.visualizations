@@ -30,12 +30,13 @@ function save(key, value) {
 // TODO: onFailure. 
 function updatePlantData(onSuccess, onFailure){
 	$.getJSON("Datos_v1_2_results.json", function(json) {
+		localStorage.clear();
 		insertManyPlantData(json);
 		writeMetaStats(json);
 		onSuccess(json)
 	})
 	.fail(function() {
-		alert('Could not connect to the internet. Data sync was not successful.')
+		alert('Could not sync data. Data sync was not successful and old data is preserved.')
 		onFailure();
 	});
 }
@@ -46,9 +47,7 @@ function updatePlantData(onSuccess, onFailure){
 
 function connectSyncButton() {
 	$('#sync').click(function() {
-		// alert('Are you sure you want to sync the data? You must be connected to the internet!')
-		// deleteOldPlantData();
-		updatePlantData(visualize,function(){});
+		updatePlantData(visualize);
 	});
 }
 

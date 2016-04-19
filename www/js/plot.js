@@ -1,3 +1,20 @@
+var es_ES = {
+  "decimal": ",",
+  "thousands": ".",
+  "grouping": [3],
+  "currency": ["€", ""],
+  "dateTime": "%a %b %e %X %Y",
+  "date": "%d/%m/%Y",
+  "time": "%H:%M:%S",
+  "periods": ["AM", "PM"],
+  "days": ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+  "shortDays": ["Dom", "Lun", "Mar", "Mi", "Jue", "Vie", "Sab"],
+  "months": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+  "shortMonths": ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+};
+
+var ES = d3.locale(es_ES);
+
 var colors; 
 
 var plantCoords = [
@@ -22,10 +39,10 @@ var units = {
 };
 
 var dataTypes = {
- "rawWaterTurbidity":"Raw Turbidity",
- "settledWaterTurbidity":"Settled Turbidity",
- "filteredWaterTurbidity":"Filtered Turbidity",
- "coagulantDose":"Coagulant" 
+ "rawWaterTurbidity":"Turbiedad de agua cruda",
+ "settledWaterTurbidity":"Turbiedad de agua decantada",
+ "filteredWaterTurbidity":"Turbiedad de agua filtrada",
+ "coagulantDose":"Dosis de coagulantes" 
 };
 
 //Hardcoded to just be Moroceli for now...
@@ -40,7 +57,7 @@ var height = 350;
 var width = 290;
 var plot_padding_right = 42;
 var plot_padding_left = 42;
-var plot_padding_bottom = 62;
+var plot_padding_bottom = 72;
 var plot_padding_top = 20;
 
 /* Create and draw axes ................................................*/
@@ -105,7 +122,8 @@ makeXScale = function(data){
 drawXAxis = function(xScale){
   var xAxis = d3.svg.axis()
     .scale(xScale)
-    .orient("bottom");
+    .orient("bottom")
+    .tickFormat(ES.timeFormat("%d %b %y"));
     
   svg.append("g")
     .attr("class", "axis")
@@ -123,7 +141,7 @@ drawXAxis = function(xScale){
     .attr("text-anchor", "middle")
     .attr("x", (width- plot_padding_left - plot_padding_right)/2.0 + plot_padding_left)
     .attr("y", height - 6)
-    .text("Time");
+    .text("Tiempo");
 }
 
 makeYScale = function(data, attr_name){
@@ -145,8 +163,8 @@ drawYAxis = function(yScale, attr_name){
     .attr("text-anchor", "middle")
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90) translate("+ (-(height - plot_padding_top - plot_padding_bottom)/2.0 - plot_padding_top) +" 3)")
-    
-    .text( dataTypes[attr_name] + " (" + units[attr_name] + ")");
+    .text( dataTypes[attr_name] + " (" + units[attr_name] + ")")
+    .attr("fill",  colors(attr_name));
 }
 
 drawSecondYAxis = function(yScale, attr_name){
@@ -162,7 +180,8 @@ drawSecondYAxis = function(yScale, attr_name){
     .attr("text-anchor", "middle")
     .attr("dy", ".75em")
     .attr("transform", "rotate(-270) translate( "+((height - plot_padding_bottom - plot_padding_top)/2.0 + plot_padding_top) +" "+(-width+3)+")")
-    .text( dataTypes[attr_name] + " (" + units[attr_name] + ")");
+    .text( dataTypes[attr_name] + " (" + units[attr_name] + ")")
+    .attr("fill",  colors(attr_name));
 }
 
 /* Make the line graph .................................................*/
@@ -278,6 +297,12 @@ function respondToCheckBox(){
   });
 }
 
+function initViz(){
+  data = retrieveAllPlantData();
+  if (data.length > 0) {
+    visualize(data)
+  }
+}
 
 //with callbakc 
 //updatePlantData();
@@ -285,11 +310,8 @@ function respondToCheckBox(){
 
 $(document).ready(function() { 
   connectSyncButton();
+  initViz();
 
-  data = retrieveAllPlantData();
-  if (data.length > 0) {
-    visualize(data)
-  }
 });
 
 //Wouldn't it be cool if they could sweep a vertical bar over the data and 
