@@ -94,7 +94,7 @@ function visualize(data) {
   data = data.filter(function(elem){return elem["purpose"] == purposeTag;}) //clear out dataless entries
   for(var key in dataTypes){
     //Don't include anything with a null field as visualization will morph with switches b/n types
-    data = data.filter(function(elem){if (elem[key]==null){console.log(elem);}return elem[key] != null;});
+    data = data.filter(function(elem){return elem[key] != null;});
   }
   dataSave =data; //scoping is very important here!! GLOBAL VARIABLE
 
@@ -290,13 +290,10 @@ function respondToCheckBox(){
     if (matches.length == 3){
       removed = matches.shift();
       $(".filled-in").prop("checked", false);
-
     } 
     filtered = dataSave; 
-    console.log(filtered.length);
     matches.forEach(function(m){
       $('#'+m).prop("checked", true);
-      //filtered = filtered.filter(function(elem){return elem[m] != null;})
     });
 
     drawPlot(filtered, "Moroceli", matches);
