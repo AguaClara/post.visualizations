@@ -85,7 +85,7 @@ function makeCheckboxes(){
 }
 
 // visualize function sorts the data and redraws the plot. To be used when the localStorage is updated. 
-function visualize(data) { 
+function visualize(data, codeList) { 
   // empty any previous plot
   $('#plot').empty();
 
@@ -94,8 +94,9 @@ function visualize(data) {
   data = data.filter(function(elem){return elem["purpose"] == purposeTag;}) //clear out dataless entries
   for(var key in dataTypes){
     //Don't include anything with a null field as visualization will morph with switches b/n types
-    data = data.filter(function(elem){if (elem[key]==null){console.log(elem);}return elem[key] != null;});
+    data = data.filter(function(elem){return elem[key] != null;});
   }
+  data = data.filter(function(elem){return ($.inArray(elem.plant, codeList)>-1) ;});
   dataSave =data; //scoping is very important here!! GLOBAL VARIABLE
 
   colors = d3.scale.category10().domain( Object.keys(dataTypes) );
@@ -209,8 +210,7 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr = null
 
   //Check if this code was selected in order to draw it
   plantCode = data[0].plant;
-  
-  if ($.inArray(plantCode, codeList)>-1){
+
     svg.append('g').append("path")
       .attr('d', lineGen(data))
       .attr('stroke', function(){
@@ -219,7 +219,7 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr = null
       .attr('stroke-width', 2)
       .attr('fill', 'none')
       .attr("id", "linegraphline"+attr_name);
-  }
+  
 }       
 
 //if the same units, we want to know so we can use the same scale
@@ -303,7 +303,7 @@ function respondToCheckBox(){
 function initViz(){
   data = retrieveAllPlantData();
   if (data.length > 0) {
-    visualize(data)
+    visualize(data, codeList);
   }
 }
 
