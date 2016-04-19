@@ -16,6 +16,7 @@ var es_ES = {
 var ES = d3.locale(es_ES);
 
 var colors; 
+var purposeTag = "plantData"; //These will be defined with numerical values
 
 var plantCoords = [
   {"lat": 14.446363, "longi" : -87.265564, "name":"Agalteca", "code":"aga"},
@@ -48,7 +49,7 @@ var dataTypes = {
 //Hardcoded to just be Moroceli for now...
 var codeList = ["Moroceli"]; //list of currently chosen plants (by code)
 
-var data;
+var dataSave;
 var svg;
 var matches; //Currently selected checkboxes
 
@@ -90,6 +91,12 @@ function visualize(data) {
 
   // sort data by type
   data = data.sort(sortByDateAscending);
+  data = data.filter(function(elem){return elem["purpose"] == purposeTag;}) //clear out dataless entries
+  for(var key in dataTypes){
+    //Don't include anything with a null field as visualization will morph with switches b/n types
+    data = data.filter(function(elem){if (elem[key]==null){console.log(elem);}return elem[key] != null;});
+  }
+  dataSave =data; //scoping is very important here!! GLOBAL VARIABLE
 
   colors = d3.scale.category10().domain( Object.keys(dataTypes) );
 
@@ -99,7 +106,7 @@ function visualize(data) {
 
   preSelectedItem = makeCheckboxes();
   matches = [preSelectedItem];
-  drawPlot(data.filter(function(elem){return elem[preSelectedItem] != null;}), "Moroceli", matches);
+  drawPlot(dataSave, "Moroceli", matches); 
   respondToCheckBox();
 }
 
@@ -185,7 +192,7 @@ drawSecondYAxis = function(yScale, attr_name){
 }
 
 /* Make the line graph .................................................*/
-function drawLines(data, xScale, yScale, attr_name, codeList){
+function drawLines(data, xScale, yScale, attr_name, codeList, second_attr = null){
   var lineGen = d3.svg.line()
     .x(function(d) {
         return xScale(new Date(d.timeStarted));
@@ -202,12 +209,10 @@ function drawLines(data, xScale, yScale, attr_name, codeList){
 
   //Check if this code was selected in order to draw it
   plantCode = data[0].plant;
-
-  filtered = data.filter(function(elem){return elem[attr_name] != null;})
   
   if ($.inArray(plantCode, codeList)>-1){
     svg.append('g').append("path")
-      .attr('d', lineGen(filtered))
+      .attr('d', lineGen(data))
       .attr('stroke', function(){
         return colors(attr_name); 
       }) 
@@ -287,10 +292,11 @@ function respondToCheckBox(){
       $(".filled-in").prop("checked", false);
 
     } 
-    filtered = data; 
+    filtered = dataSave; 
+    console.log(filtered.length);
     matches.forEach(function(m){
       $('#'+m).prop("checked", true);
-      filtered = filtered.filter(function(elem){return elem[m] != null;})
+      //filtered = filtered.filter(function(elem){return elem[m] != null;})
     });
 
     drawPlot(filtered, "Moroceli", matches);
