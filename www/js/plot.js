@@ -46,9 +46,6 @@ var dataTypes = {
  "coagulantDose":"Dosis de coagulantes" 
 };
 
-//Hardcoded to just be Moroceli for now...
-var codeList = ["Moroceli"]; //list of currently chosen plants (by code)
-
 var dataSave;
 var svg;
 var matches; //Currently selected checkboxes
@@ -85,18 +82,19 @@ function makeCheckboxes(){
 }
 
 // visualize function sorts the data and redraws the plot. To be used when the localStorage is updated. 
-function visualize(data) { 
+function visualize(data, codeList) { 
   // empty any previous plot
   $('#plot').empty();
-
   // sort data by type
-  data = data.sort(sortByDateAscending);
   data = data.filter(function(elem){return elem["purpose"] == purposeTag;}) //clear out dataless entries
   for(var key in dataTypes){
     //Don't include anything with a null field as visualization will morph with switches b/n types
     data = data.filter(function(elem){return elem[key] != null;});
   }
+  data = data.filter(function(elem){return ($.inArray(elem.plant, codeList)>-1) ;});
+  data = data.sort(sortByDateAscending);
   dataSave =data; //scoping is very important here!! GLOBAL VARIABLE
+
 
   colors = d3.scale.category10().domain( Object.keys(dataTypes) );
 
@@ -107,7 +105,7 @@ function visualize(data) {
   preSelectedItem = makeCheckboxes();
   matches = [preSelectedItem];
   drawPlot(dataSave, "Moroceli", matches); 
-  respondToCheckBox();
+  respondToCheckBox(codeList);
 }
 
 /* Sort input data by date .............................................*/
@@ -209,8 +207,7 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr = null
 
   //Check if this code was selected in order to draw it
   plantCode = data[0].plant;
-  
-  if ($.inArray(plantCode, codeList)>-1){
+
     svg.append('g').append("path")
       .attr('d', lineGen(data))
       .attr('stroke', function(){
@@ -219,7 +216,7 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr = null
       .attr('stroke-width', 2)
       .attr('fill', 'none')
       .attr("id", "linegraphline"+attr_name);
-  }
+  
 }       
 
 //if the same units, we want to know so we can use the same scale
@@ -238,7 +235,7 @@ function hasMaxScale(data, codelist){
 /* code = 
  * selectedList = len 1 or 2 of checkboxes that have been checked
  */
-function drawPlot(data, code, selectedList){
+function drawPlot(data, code, selectedList, codeList){
   svg.selectAll(".axis").remove();
   svg.selectAll("path").remove();
   svg.selectAll("text").remove();
@@ -278,7 +275,7 @@ function drawPlot(data, code, selectedList){
   }
 }
 
-function respondToCheckBox(){
+function respondToCheckBox(codeList){
   $(".filled-in").on("click", function() {
     if ($.inArray(this.value, matches)==-1){
       matches.push(this.value);
@@ -296,14 +293,15 @@ function respondToCheckBox(){
       $('#'+m).prop("checked", true);
     });
 
-    drawPlot(filtered, "Moroceli", matches);
+    drawPlot(filtered, "Moroceli", matches, codeList);
   });
 }
 
-function initViz(){
+function initViz(codeList){
   data = retrieveAllPlantData();
   if (data.length > 0) {
-    visualize(data)
+    visualize(data, codeList);
+  }else{
   }
 }
 
@@ -312,8 +310,10 @@ function initViz(){
 
 
 $(document).ready(function() { 
+  //Hardcoded to just be Moroceli for now...
+  var codeList = ["Moroceli"]; //list of currently chosen plants (by code)
   connectSyncButton();
-  initViz();
+  initViz(codeList);
 
 });
 
