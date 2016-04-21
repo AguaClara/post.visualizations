@@ -29,11 +29,13 @@ function save(key, value) {
 // The onSuccess(data) function must take in an array of data objects.
 // TODO: onFailure. 
 function updatePlantData(onSuccess, onFailure){
-	$.getJSON("Datos_v1_2_results.json", function(json) {
+	var codeList = [askForPlantName()]; //TODO not be hardcoded
+	console.log(codeList);
+	$.getJSON("data/Datos_v1_2_results.json", function(json) {
 		localStorage.clear();
 		insertManyPlantData(json);
 		writeMetaStats(json);
-		onSuccess(json)
+		onSuccess(json,codeList)
 	})
 	.fail(function() {
 		alert('Could not sync data. Data sync was not successful and old data is preserved.')
@@ -47,7 +49,8 @@ function updatePlantData(onSuccess, onFailure){
 
 function connectSyncButton() {
 	$('#sync').click(function() {
-		updatePlantData(visualize);
+		var codeList = [askForPlantName()];
+		updatePlantData(visualize, codeList);
 	});
 }
 
