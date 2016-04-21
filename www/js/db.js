@@ -31,7 +31,7 @@ function save(key, value) {
 function updatePlantData(onSuccess, onFailure){
 	var codeList = [askForPlantName()]; //TODO not be hardcoded
 	console.log(codeList);
-	$.getJSON("data/Datos_v1_2_results.json", function(json) {
+	$.getJSON("http://odk-post-receiver-1288.appspot.com/getdata", function(json) {
 		localStorage.clear();
 		insertManyPlantData(json);
 		writeMetaStats(json);
