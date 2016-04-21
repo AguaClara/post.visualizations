@@ -83,19 +83,15 @@ function makeCheckboxes(){
 
 // visualize function sorts the data and redraws the plot. To be used when the localStorage is updated. 
 function visualize(data, codeList) { 
-  console.log(codeList);
   // empty any previous plot
   $('#plot').empty();
   // sort data by type
-  console.log(data.length);
   data = data.filter(function(elem){return elem["purpose"] == purposeTag;}) //clear out dataless entries
-  console.log(data.length);
   for(var key in dataTypes){
     //Don't include anything with a null field as visualization will morph with switches b/n types
     data = data.filter(function(elem){return elem[key] != null;});
   }
   data = data.filter(function(elem){return ($.inArray(elem.plant, codeList)>-1) ;});
-  console.log(data.length);
   data = data.sort(sortByDateAscending);
   dataSave =data; //scoping is very important here!! GLOBAL VARIABLE
 
@@ -120,7 +116,6 @@ function sortByDateAscending(a, b) {
 
 makeXScale = function(data){
   //Can take first and last because they are already sorted
-  console.log(data);
   xMin = new Date(data[0].timeStarted);
   xMax = new Date(data[data.length-1].timeStarted);
   xScale = d3.time.scale()
