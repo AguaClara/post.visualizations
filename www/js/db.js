@@ -30,16 +30,17 @@ function save(key, value) {
 // TODO: onFailure. 
 function updatePlantData(onSuccess, onFailure){
 	var codeList = [askForPlantName()]; //TODO not be hardcoded
-	console.log(codeList);
-	$.getJSON("http://odk-post-receiver-1288.appspot.com/getdata", function(json) {
+	$.getJSON("data/Datos_v1_2_results.json", function(json) {
 		localStorage.clear();
 		insertManyPlantData(json);
 		writeMetaStats(json);
-		onSuccess(json,codeList)
+		onSuccess(json,codeList);
+		$('#spinnerDestination').html();
 	})
 	.fail(function() {
 		alert('Could not sync data. Data sync was not successful and old data is preserved.')
 		onFailure();
+		$('#spinnerDestination').html("");
 	});
 }
 
@@ -50,6 +51,19 @@ function updatePlantData(onSuccess, onFailure){
 function connectSyncButton() {
 	$('#sync').click(function() {
 		var codeList = [askForPlantName()];
+		spinnerCode = ''+
+		'<div class="preloader-wrapper small active">'+ 
+          '<div class="spinner-layer spinner-green-only" >'+
+            '<div class="circle-clipper left">'+
+              '<div class="circle"></div>'+
+            '</div><div class="gap-patch">' +
+              '<div class="circle"></div>'+
+            '</div><div class="circle-clipper right">'+
+              '<div class="circle"></div>'+
+            '</div>'+
+          '</div>'+
+        '</div>';
+		$('#spinnerDestination').html(spinnerCode);
 		updatePlantData(visualize, codeList);
 	});
 }
