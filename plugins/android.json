@@ -9,6 +9,9 @@
     "installed_plugins": {
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "org.aguaclara.post.visualizations"
+        },
+        "cordova-plugin-google-analytics": {
+            "PACKAGE_NAME": "org.aguaclara.post.visualizations"
         }
     },
     "dependent_plugins": {}

@@ -308,6 +308,10 @@ function initViz(codeList){
   }
 }
 
+// function initTracking(){
+//   window.analytics.startTrackerWithId('UA-76711924-2');
+// }
+
 //with callbakc 
 //updatePlantData();
 
@@ -317,7 +321,6 @@ $(document).ready(function() {
   var codeList = ["Moroceli"]; //list of currently chosen plants (by code)
   connectSyncButton();
   initViz(codeList);
-
 });
 
 //Wouldn't it be cool if they could sweep a vertical bar over the data and 
