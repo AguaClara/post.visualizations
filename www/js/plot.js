@@ -146,7 +146,7 @@ drawXAxis = function(xScale){
     .attr("text-anchor", "middle")
     .attr("x", (width- plot_padding_left - plot_padding_right)/2.0 + plot_padding_left)
     .attr("y", height - 6)
-    .text("Tiempo");
+    .text("Fecha");
 }
 
 makeYScale = function(data, attr_name){
