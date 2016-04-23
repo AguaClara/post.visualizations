@@ -49,9 +49,21 @@ function updatePlantData(onSuccess, onFailure){
 
 
 function connectSyncButton() {
-	$('#sync').click(function() {
+	$('#sync-viz').click(function() {
 		var codeList = [askForPlantName()];
-		spinnerCode = ''+
+		addSpinner('#spinnerDestination');
+		updatePlantData(visualize, codeList);
+	});
+	$('#sync-table').click(function(){
+		var codeList = [askForPlantName()];
+		addSpinner('#spinnerDestination');
+		updatePlantData(settable, codeList);
+	});
+}
+
+/*Add a beautiful Materialize loading spinner to the page!*/
+function addSpinner(spinnerDest){
+	spinnerCode = ''+
 		'<div class="preloader-wrapper small active">'+ 
           '<div class="spinner-layer spinner-green-only" >'+
             '<div class="circle-clipper left">'+
@@ -63,9 +75,7 @@ function connectSyncButton() {
             '</div>'+
           '</div>'+
         '</div>';
-		$('#spinnerDestination').html(spinnerCode);
-		updatePlantData(visualize, codeList);
-	});
+	$(spinnerDest).html(spinnerCode);
 }
 
 // Inserts a list of plant data records into local storage
