@@ -14,7 +14,7 @@ var es_ES = {
 };
 
 var ES = d3.locale(es_ES);
-var EsDateFormat = ES.timeFormat("%d %b, %Y; %H:%M"); //Format datetimes in table
+var EsDateFormat = ES.timeFormat("%d %b, %Y; %I:%M %p"); //Format datetimes in table
 
 table1Dict = {"timeFinished":"Hora de<br/>finalización",
               "flowRate":"Caudal<br/>(L/s)", //CHECK THAT EVERYTHING HAS THESE UNITS
