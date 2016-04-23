@@ -190,7 +190,10 @@ drawSecondYAxis = function(yScale, attr_name){
 }
 
 /* Make the line graph .................................................*/
-function drawLines(data, xScale, yScale, attr_name, codeList, second_attr = null){
+function drawLines(data, xScale, yScale, attr_name, codeList, second_attr){
+  if (second_attr == undefined) {
+    second_attr = null;
+  }
   var lineGen = d3.svg.line()
     .x(function(d) {
         return xScale(new Date(d.timeStarted));
