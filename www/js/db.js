@@ -30,12 +30,12 @@ function save(key, value) {
 // TODO: onFailure. 
 function updatePlantData(onSuccess, onFailure){
 	var codeList = [askForPlantName()]; //TODO not be hardcoded
-	$.getJSON("data/Datos_v1_2_results.json", function(json) {
+	$.getJSON("http://odk-post-receiver-1288.appspot.com/getdata", function(json) {
 		localStorage.clear();
 		insertManyPlantData(json);
 		writeMetaStats(json);
 		onSuccess(json,codeList);
-		$('#spinnerDestination').html();
+		$('#spinnerDestination').html("");
 	})
 	.fail(function() {
 		alert('Could not sync data. Data sync was not successful and old data is preserved.')
