@@ -6,11 +6,34 @@
 // Methods to be used from outside scripts. Clearly defined with easy to understand
 // pre- and post- conditions
 
+var table_id = "10IZcGT_2mHKS8cLOcvB_4BSj0LEFDKS5eJhPrGqE"
+var data = [];
+
+function encode_fusion_table_sql(sql_string) {
+	var base_url = "https://www.googleapis.com/fusiontables/v2/"
+	var initiate_sql_query = "query?sql="
+	var api_key = "&key=AIzaSyB9wik36h46yNJznjYjUTXHOu5py9anRFY"
+	sql_string = base_url + initiate_sql_query + encodeURIComponent(sql_string) + api_key;
+	return sql_string
+}
+
 // Get all the local plant data. If there is no plant data locally, this will return an empty list.
-function retrieveAllPlantData() {
+function retrieveAllPlantData(column_string) {
 	var plantData = [];
-	for ( var i = 0, len = localStorage.length-3; i < len; ++i ) {
-  	 plantData[i] = JSON.parse(localStorage.getItem( localStorage.key( i ) ) );
+	if (localStorage.length == 0) {
+		return plantData
+	}
+	// Loop through selected localstorage held json strings
+	if (column_string == undefined) {
+		for ( var i = 0, len = localStorage.length-4; i < len; ++i ) {	
+			plantData[i] = JSON.parse(localStorage.getItem( localStorage.key( i ) ));
+		}
+	}
+	else {
+		for ( var i = 0, len = localStorage.length-4; i < len; ++i ) {
+			// Set default start and stop indices if left undefined
+			plantData[i] = JSON.parse(localStorage.getItem( localStorage.key( i ) ))[getColumnIndex(column_string)];
+		}
 	}
 	return plantData
 }
@@ -25,16 +48,42 @@ function save(key, value) {
 	localStorage.setItem(key, value);
 }
 
+// Get the index of the row arrays that columnString appears on. This relies on localStorage being populated.
+function getColumnIndex(columnString) {
+	var columnData = JSON.parse(localStorage.getItem('columnData'));
+	return columnData.indexOf(column_string);
+}
+
+// Put data into dictionary... Specifically make and array of rows (arrays) that have fields specified by 
+// column array into an array of disctionaries
+function makeDictionary(rowArray, columnArray) {
+	var plantDataDictArray = [];
+	for ( var i = 0, rowLen = rowArray.length-1; i < rowLen; ++i ) {
+		for ( var j = 0, colLen = columnArray.length-1; j < colLen; ++j ) {
+			plantDataDictArray[i].push({[columnArray[j],rowArray[i][j]});
+		}
+	}
+	return plantDataDictArray
+}
+
+
 // Asynchronous function to download plant data and store it locally. Input callback function. 
 // The onSuccess(data) function must take in an array of data objects.
 // TODO: onFailure. 
 function updatePlantData(onSuccess, onFailure){
 	var codeList = [askForPlantName()]; //TODO not be hardcoded
-	$.getJSON("http://odk-post-receiver-1288.appspot.com/getdata", function(json) {
+	var sql_query = "SELECT * FROM " + table_id + " WHERE coagulantDose=3.3";
+	sql_query_url = encode_fusion_table_sql(sql_query);
+	console.log(sql_query_url);
+	$.getJSON(sql_query_url, function(json) {
+		console.log(json);
+	})
+	$.getJSON(sql_query_url, function(json) {
 		localStorage.clear();
-		insertManyPlantData(json);
 		writeMetaStats(json);
-		onSuccess(json,codeList);
+		var plantDataDictArray = makeDictionary(json.rows, json.columns);
+		insertManyPlantData(plantDataDictArray);
+		onSuccess(plantDataDictArray,codeList);
 		$('#spinnerDestination').html("");
 	})
 	.fail(function() {
@@ -70,7 +119,7 @@ function connectSyncButton() {
 
 // Inserts a list of plant data records into local storage
 function insertManyPlantData(plantData) {
-	for (i in plantData) {
+	for ( var i = 0, len = plantData.length-1; i < len; ++i ) {
 		setPlantDataRecord(plantData[i])
 	}
 }
@@ -84,9 +133,10 @@ function setPlantDataRecord(plantDataRecord) {
 // plant data, and the range of keys currently held in local storage
 function initializeMetaStats(json) {
 	var plantName = askForPlantName();
+	localStorage.setItem('columnData', JSON.stringify(json.columns));
 	localStorage.setItem('plantName', plantName);
-	localStorage.setItem('minDate', json[0].date_submitted);
-	localStorage.setItem('maxDate', json[json.length-1].date_submitted);
+	// localStorage.setItem('minDate', json[0].date_submitted);
+	// localStorage.setItem('maxDate', json[json.length-1].date_submitted);
 }
 function writeMetaStats(json) {
 	var minDate = localStorage.getItem('minDate');
