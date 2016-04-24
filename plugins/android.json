@@ -12,6 +12,9 @@
         },
         "cordova-plugin-google-analytics": {
             "PACKAGE_NAME": "org.aguaclara.post.visualizations"
+        },
+        "cordova-sqlite-storage": {
+            "PACKAGE_NAME": "org.aguaclara.post.visualizations"
         }
     },
     "dependent_plugins": {}

@@ -25,7 +25,7 @@ function retrieveAllPlantData(column_string) {
 	}
 	// Loop through selected localstorage held json strings
 	if (column_string == undefined) {
-		for ( var i = 0, len = localStorage.length-4; i < len; ++i ) {	
+		for ( var i = 0, len = localStorage.length-2; i < len; ++i ) {	
 			plantData[i] = JSON.parse(localStorage.getItem( localStorage.key( i ) ));
 		}
 	}
@@ -59,8 +59,9 @@ function getColumnIndex(columnString) {
 function makeDictionary(rowArray, columnArray) {
 	var plantDataDictArray = [];
 	for ( var i = 0, rowLen = rowArray.length-1; i < rowLen; ++i ) {
+		plantDataDictArray[i] = {};
 		for ( var j = 0, colLen = columnArray.length-1; j < colLen; ++j ) {
-			plantDataDictArray[i].push({[columnArray[j],rowArray[i][j]});
+			plantDataDictArray[i][columnArray[j]]=rowArray[i][j];
 		}
 	}
 	return plantDataDictArray
@@ -80,7 +81,7 @@ function updatePlantData(onSuccess, onFailure){
 	})
 	$.getJSON(sql_query_url, function(json) {
 		localStorage.clear();
-		writeMetaStats(json);
+		localStorage.setItem('columnData', JSON.stringify(json.columns));
 		var plantDataDictArray = makeDictionary(json.rows, json.columns);
 		insertManyPlantData(plantDataDictArray);
 		onSuccess(plantDataDictArray,codeList);
@@ -127,25 +128,6 @@ function insertManyPlantData(plantData) {
 // Put the plant data record into storage
 function setPlantDataRecord(plantDataRecord) {
 	localStorage.setItem(plantDataRecord.timeStarted, JSON.stringify(plantDataRecord));
-}
-
-// MetaStats is an object that will store all of the persistent data, such as 
-// plant data, and the range of keys currently held in local storage
-function initializeMetaStats(json) {
-	var plantName = askForPlantName();
-	localStorage.setItem('columnData', JSON.stringify(json.columns));
-	localStorage.setItem('plantName', plantName);
-	// localStorage.setItem('minDate', json[0].date_submitted);
-	// localStorage.setItem('maxDate', json[json.length-1].date_submitted);
-}
-function writeMetaStats(json) {
-	var minDate = localStorage.getItem('minDate');
-	if (minDate == null) {
-		initializeMetaStats(json);
-	}
-	else {
-		localStorage.setItem('minDate', json[json.length-1].timeStarted);
-	}
 }
 
 //TODO Functions
