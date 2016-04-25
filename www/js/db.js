@@ -7,7 +7,7 @@
 // pre- and post- conditions
 
 var table_id = "10IZcGT_2mHKS8cLOcvB_4BSj0LEFDKS5eJhPrGqE"
-var data = [];
+var number_of_data_points = 100;
 
 function encode_fusion_table_sql(sql_string) {
 	var base_url = "https://www.googleapis.com/fusiontables/v2/"
@@ -73,7 +73,7 @@ function makeDictionary(rowArray, columnArray) {
 // TODO: onFailure. 
 function updatePlantData(onSuccess, onFailure){
 	var codeList = [askForPlantName()]; //TODO not be hardcoded
-	var sql_query = "SELECT * FROM " + table_id + " WHERE coagulantDose=3.3";
+	var sql_query = "SELECT * FROM " + table_id + " order by timeFinished desc limit " + number_of_data_points;
 	sql_query_url = encode_fusion_table_sql(sql_query);
 	console.log(sql_query_url);
 	$.getJSON(sql_query_url, function(json) {
