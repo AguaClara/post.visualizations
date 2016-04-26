@@ -2,22 +2,25 @@
 // provides a simple way to store two weeks worth of data. If we decide to store more, or for whatever
 // reason local storage doesn't work, perhaps we should move to a SQLite plugin within PhoneGap. TBD
 
+// TODO: Use column_string when retrieving data to ease parsing. 
+
 // --------------------------------------Public Methods--------------------------------------------
 // Methods to be used from outside scripts. Clearly defined with easy to understand
 // pre- and post- conditions
 
 var table_id = "10IZcGT_2mHKS8cLOcvB_4BSj0LEFDKS5eJhPrGqE"
-var number_of_data_points = 100;
+var number_of_data_points = 5;
 
 function encode_fusion_table_sql(sql_string) {
-	var base_url = "https://www.googleapis.com/fusiontables/v2/"
-	var initiate_sql_query = "query?sql="
-	var api_key = "&key=AIzaSyB9wik36h46yNJznjYjUTXHOu5py9anRFY"
+	var base_url = "https://www.googleapis.com/fusiontables/v2/";
+	var initiate_sql_query = "query?sql=";
+	var api_key = "&key=AIzaSyB9wik36h46yNJznjYjUTXHOu5py9anRFY";
 	sql_string = base_url + initiate_sql_query + encodeURIComponent(sql_string) + api_key;
 	return sql_string
 }
 
-// Get all the local plant data. If there is no plant data locally, this will return an empty list.
+// Get all the local plant data. If there is no plant data locally, this will return an empty list. If you don't 
+// specify a column_string, this will return all of the columns
 function retrieveAllPlantData(column_string) {
 	var plantData = [];
 	if (localStorage.length == 0) {
@@ -25,12 +28,12 @@ function retrieveAllPlantData(column_string) {
 	}
 	// Loop through selected localstorage held json strings
 	if (column_string == undefined) {
-		for ( var i = 0, len = localStorage.length-2; i < len; ++i ) {	
+		for ( var i = 0, len = localStorage.length; i < len; ++i ) {	
 			plantData[i] = JSON.parse(localStorage.getItem( localStorage.key( i ) ));
 		}
 	}
 	else {
-		for ( var i = 0, len = localStorage.length-4; i < len; ++i ) {
+		for ( var i = 0, len = localStorage.length; i < len; ++i ) {
 			// Set default start and stop indices if left undefined
 			plantData[i] = JSON.parse(localStorage.getItem( localStorage.key( i ) ))[getColumnIndex(column_string)];
 		}
@@ -58,9 +61,9 @@ function getColumnIndex(columnString) {
 // column array into an array of disctionaries
 function makeDictionary(rowArray, columnArray) {
 	var plantDataDictArray = [];
-	for ( var i = 0, rowLen = rowArray.length-1; i < rowLen; ++i ) {
+	for ( var i = 0, rowLen = rowArray.length; i < rowLen; ++i ) {
 		plantDataDictArray[i] = {};
-		for ( var j = 0, colLen = columnArray.length-1; j < colLen; ++j ) {
+		for ( var j = 0, colLen = columnArray.length; j < colLen; ++j ) {
 			plantDataDictArray[i][columnArray[j]]=rowArray[i][j];
 		}
 	}
@@ -130,14 +133,9 @@ function addSpinner(spinnerDest){
 
 // Inserts a list of plant data records into local storage
 function insertManyPlantData(plantData) {
-	for ( var i = 0, len = plantData.length-1; i < len; ++i ) {
-		setPlantDataRecord(plantData[i])
+	for ( var i = 0, len = plantData.length; i < len; ++i ) {
+		localStorage.setItem(plantData[i].timeStarted, JSON.stringify(plantData[i]));
 	}
-}
-
-// Put the plant data record into storage
-function setPlantDataRecord(plantDataRecord) {
-	localStorage.setItem(plantDataRecord.timeStarted, JSON.stringify(plantDataRecord));
 }
 
 //TODO Functions
