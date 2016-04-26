@@ -59,9 +59,14 @@ function settable(data, codeList){
                     .append("table")
                       .attr("id","table2")
                       .attr("class","centered striped responsive-table");
- 
-  var entry = tabledata.pop();
-  //console.log(entry.purpose);
+  // for(var i in tabledata){
+  //   console.log(i);
+  //   console.log(tabledata[i]);
+  // }
+  var entry = tabledata[0];
+
+
+  // console.log(entry);
   //console.log("plantData" in ["plantData"]);
   var roll = table.append("thead").append("tr");
   var roll2 = table2.append("thead").append("tr");
@@ -73,13 +78,16 @@ function settable(data, codeList){
     roll2.append("th").html(table2Dict[column2[i]]);
   }
   roll2 = table2.append("tbody");
-  console.log(new Date(entry.timeStarted));
-  console.log(datebound);
-  for(var q=0; q<tabledata.length; q++){
+//  console.log(new Date(entry.timeStarted));
+// console.log(datebound);
+// var count = 0;
+  for(var q=1; q<=tabledata.length; q++){
 
     if(new Date(entry.timeStarted)>datebound){    
       if(entry.purpose.indexOf("plantData")!= -1){
+        console.log(entry);
         var r = roll.append("tr");
+        // count++;
         for(var i in column){
           if (column[i] == "timeFinished"){
             r.append("td").html(EsDateFormat(new Date(entry[column[i]])) + "<br/><span style='opacity:0'>--</span>");
@@ -92,6 +100,8 @@ function settable(data, codeList){
       } 
       if(entry.purpose.indexOf("backwash")!= -1|| entry.purpose.indexOf("maintenanceDone")!=-1){
         var r2 = roll2.append("tr");
+        console.log(entry);
+        // count++; 
         for(var i in column2){
           if(entry[column2[i]]==null){ r2.append("td").html("--");}
           else if (column2[i]=="timeStarted"){
@@ -105,9 +115,10 @@ function settable(data, codeList){
       }
       
     }
-    entry = tabledata.pop();
+    if(q!=tabledata.length) entry = tabledata[q];
   }
-  console.log(tabledata.length);
+  // console.log(tabledata.length);
+  // console.log(count);
 }
 
 
