@@ -9,7 +9,7 @@
 // pre- and post- conditions
 
 var table_id = "10IZcGT_2mHKS8cLOcvB_4BSj0LEFDKS5eJhPrGqE"
-var number_of_data_points = 5;
+var number_of_data_points = 100;
 
 function encode_fusion_table_sql(sql_string) {
 	var base_url = "https://www.googleapis.com/fusiontables/v2/";
