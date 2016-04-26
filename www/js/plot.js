@@ -53,8 +53,8 @@ var matches; //Currently selected checkboxes
 /* Create plot .........................................................*/
 var height = 350;
 var width = 290;
-var plot_padding_right = 42;
-var plot_padding_left = 42;
+var plot_padding_right = 45;
+var plot_padding_left = 45;
 var plot_padding_bottom = 72;
 var plot_padding_top = 20;
 
@@ -202,7 +202,7 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr){
         return yScale(d[attr_name]);
     })
     .defined(function(d) { 
-      return !isNaN(d[attr_name]) && d[attr_name]!=null; 
+      return !isNaN(d[attr_name]) && d[attr_name]!=null && d[attr_name]!="NaN"; 
     });  
 
   //Draw the line graph for each plant with code in codelist
@@ -308,6 +308,10 @@ function initViz(codeList){
   }
 }
 
+// function initTracking(){
+//   window.analytics.startTrackerWithId('UA-76711924-2');
+// }
+
 //with callbakc 
 //updatePlantData();
 
@@ -317,7 +321,6 @@ $(document).ready(function() {
   var codeList = ["Moroceli"]; //list of currently chosen plants (by code)
   connectSyncButton();
   initViz(codeList);
-
 });
 
 //Wouldn't it be cool if they could sweep a vertical bar over the data and 
