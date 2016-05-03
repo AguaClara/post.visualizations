@@ -87,10 +87,11 @@ function visualize(data, codeList) {
   $('#plot').empty();
   // sort data by type
   data = data.filter(function(elem){return elem["purpose"] == purposeTag;}) //clear out dataless entries
-  for(var key in dataTypes){
+  /*for(var key in dataTypes){
     //Don't include anything with a null field as visualization will morph with switches b/n types
-    data = data.filter(function(elem){return elem[key] != null;});
+    data = data.filter(function(elem){return !isNaN(elem[key]) && elem[key]!=null && elem[key]!="NaN" && elem[key]!=""});
   }
+  */
   data = data.filter(function(elem){return ($.inArray(elem.plant, codeList)>-1) ;});
   data = data.sort(sortByDateAscending);
   dataSave =data; //scoping is very important here!! GLOBAL VARIABLE
@@ -151,7 +152,7 @@ drawXAxis = function(xScale){
 
 makeYScale = function(data, attr_name){
   var yScale = d3.scale.linear()
-    .domain([0, d3.max(data, function (d) {return d[attr_name]; })])
+    .domain([0, d3.max(data, function (d) {if (!isNaN(d[attr_name])){return d[attr_name]; }})])
     .range([height-plot_padding_bottom, plot_padding_top]);
   return yScale;
 }
@@ -202,7 +203,7 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr){
         return yScale(d[attr_name]);
     })
     .defined(function(d) { 
-      return !isNaN(d[attr_name]) && d[attr_name]!=null && d[attr_name]!="NaN"; 
+      return (!(isNaN(d[attr_name]) || d[attr_name]==null || d[attr_name]=="NaN" || d[attr_name]=="")); 
     });  
 
   //Draw the line graph for each plant with code in codelist
@@ -230,8 +231,8 @@ function isSameUnits(codelist, units){
 
 //return the name of the field that has the larger scale
 function hasMaxScale(data, codelist){
-  max1 = d3.max(data, function (d) {return d[codelist[0]]; });
-  max2 = d3.max(data, function (d) {return d[codelist[1]]; });
+  max1 = d3.max(data, function (d) {if (!isNaN(d[codelist[0]])){return d[codelist[0]]; }});
+  max2 = d3.max(data, function (d) {if (!isNaN(d[codelist[1]])){return d[codelist[1]]; }});
   if(max1 > max2){return codelist[0];} return codelist[1];
 }
 
