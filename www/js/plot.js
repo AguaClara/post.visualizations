@@ -203,7 +203,7 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr){
         return yScale(d[attr_name]);
     })
     .defined(function(d) { 
-      return (!(isNaN(d[attr_name]) || d[attr_name]==null || d[attr_name]=="NaN" || d[attr_name]=="")); 
+      return (!(isNaN(d[attr_name]) || d[attr_name]==null || d[attr_name]=="NaN")); 
     });  
 
   //Draw the line graph for each plant with code in codelist
