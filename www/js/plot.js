@@ -112,13 +112,13 @@ function visualize(data, codeList) {
 /* Sort input data by date .............................................*/
 function sortByDateAscending(a, b) {
   // Dates will be cast to numbers automagically:
-  return new Date(a.timeStarted) - new Date(b.timeStarted);
+  return new Date(a.timeFinished) - new Date(b.timeFinished);
 }
 
 makeXScale = function(data){
   //Can take first and last because they are already sorted
-  xMin = new Date(data[0].timeStarted);
-  xMax = new Date(data[data.length-1].timeStarted);
+  xMin = new Date(data[0].timeFinished);
+  xMax = new Date(data[data.length-1].timeFinished);
   xScale = d3.time.scale()
     .domain([xMin, xMax])
     .range([plot_padding_left, width-plot_padding_right]);
@@ -197,7 +197,7 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr){
   }
   var lineGen = d3.svg.line()
     .x(function(d) {
-        return xScale(new Date(d.timeStarted));
+        return xScale(new Date(d.timeFinished));
     })
     .y(function(d) {
         return yScale(d[attr_name]);
