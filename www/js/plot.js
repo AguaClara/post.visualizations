@@ -53,8 +53,8 @@ var matches; //Currently selected checkboxes
 /* Create plot .........................................................*/
 var height = 350;
 var width = 290;
-var plot_padding_right = 42;
-var plot_padding_left = 42;
+var plot_padding_right = 45;
+var plot_padding_left = 45;
 var plot_padding_bottom = 72;
 var plot_padding_top = 20;
 
@@ -87,10 +87,11 @@ function visualize(data, codeList) {
   $('#plot').empty();
   // sort data by type
   data = data.filter(function(elem){return elem["purpose"] == purposeTag;}) //clear out dataless entries
-  for(var key in dataTypes){
+  /*for(var key in dataTypes){
     //Don't include anything with a null field as visualization will morph with switches b/n types
-    data = data.filter(function(elem){return elem[key] != null;});
+    data = data.filter(function(elem){return !isNaN(elem[key]) && elem[key]!=null && elem[key]!="NaN" && elem[key]!=""});
   }
+  */
   data = data.filter(function(elem){return ($.inArray(elem.plant, codeList)>-1) ;});
   data = data.sort(sortByDateAscending);
   dataSave =data; //scoping is very important here!! GLOBAL VARIABLE
@@ -111,13 +112,13 @@ function visualize(data, codeList) {
 /* Sort input data by date .............................................*/
 function sortByDateAscending(a, b) {
   // Dates will be cast to numbers automagically:
-  return new Date(a.timeStarted) - new Date(b.timeStarted);
+  return new Date(a.timeFinished) - new Date(b.timeFinished);
 }
 
 makeXScale = function(data){
   //Can take first and last because they are already sorted
-  xMin = new Date(data[0].timeStarted);
-  xMax = new Date(data[data.length-1].timeStarted);
+  xMin = new Date(data[0].timeFinished);
+  xMax = new Date(data[data.length-1].timeFinished);
   xScale = d3.time.scale()
     .domain([xMin, xMax])
     .range([plot_padding_left, width-plot_padding_right]);
@@ -151,7 +152,7 @@ drawXAxis = function(xScale){
 
 makeYScale = function(data, attr_name){
   var yScale = d3.scale.linear()
-    .domain([0, d3.max(data, function (d) {return d[attr_name]; })])
+    .domain([0, d3.max(data, function (d) {if (!isNaN(d[attr_name])){return d[attr_name]; }})])
     .range([height-plot_padding_bottom, plot_padding_top]);
   return yScale;
 }
@@ -196,30 +197,31 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr){
   }
   var lineGen = d3.svg.line()
     .x(function(d) {
-        return xScale(new Date(d.timeStarted));
+        return xScale(new Date(d.timeFinished));
     })
     .y(function(d) {
         return yScale(d[attr_name]);
     })
     .defined(function(d) { 
-      return !isNaN(d[attr_name]) && d[attr_name]!=null; 
+      return (!(isNaN(d[attr_name]) || d[attr_name]==null || d[attr_name]=="NaN" || isNaN(yScale(d[attr_name])))); 
     });  
+
 
   //Draw the line graph for each plant with code in codelist
   svg.selectAll("#linegraphline"+attr_name).remove();
+  if (lineGen(data)!=null){
+    //Check if this code was selected in order to draw it
+    plantCode = data[0].plant;
 
-  //Check if this code was selected in order to draw it
-  plantCode = data[0].plant;
-
-    svg.append('g').append("path")
-      .attr('d', lineGen(data))
-      .attr('stroke', function(){
-        return colors(attr_name); 
-      }) 
-      .attr('stroke-width', 2)
-      .attr('fill', 'none')
-      .attr("id", "linegraphline"+attr_name);
-  
+      svg.append('g').append("path")
+        .attr('d', lineGen(data))
+        .attr('stroke', function(){
+          return colors(attr_name); 
+        }) 
+        .attr('stroke-width', 2)
+        .attr('fill', 'none')
+        .attr("id", "linegraphline"+attr_name);
+  }  
 }       
 
 //if the same units, we want to know so we can use the same scale
@@ -230,9 +232,14 @@ function isSameUnits(codelist, units){
 
 //return the name of the field that has the larger scale
 function hasMaxScale(data, codelist){
-  max1 = d3.max(data, function (d) {return d[codelist[0]]; });
-  max2 = d3.max(data, function (d) {return d[codelist[1]]; });
-  if(max1 > max2){return codelist[0];} return codelist[1];
+  max1 = d3.max(data, function (d) {if (!isNaN(d[codelist[0]])){return d[codelist[0]]; }});
+  max2 = d3.max(data, function (d) {if (!isNaN(d[codelist[1]])){return d[codelist[1]]; }});
+  if(max1 > max2){return codelist[0];} 
+  else if(max2 > max1){return codelist[1];}
+  else if(max1==max2 && max1!=undefined){return codelist[0];} 
+  else if(max1!=undefined && max2==undefined){return codelist[0];}//Do separately because of awful JS handling of null type
+  else if(max1==undefined && max2!=undefined){return codelist[1];}
+  return null;
 }
 
 /* code = 
@@ -251,14 +258,16 @@ function drawPlot(data, code, selectedList, codeList){
     attr1 = selectedList[0];
     attr2 = selectedList[1];
     maxField = hasMaxScale(data, selectedList); //ID of the scale with the larger range.
-    
-    yScale = makeYScale(data, maxField); 
-    drawYAxis(yScale, attr1);
-    drawLines(data, xScale, yScale, attr1, codeList);
 
-    yScale2 = makeYScale(data, maxField);
-    drawSecondYAxis(yScale2, attr2);
-    drawLines(data, xScale, yScale2, attr2, codeList);
+    if (maxField!=null){
+      yScale = makeYScale(data, maxField); 
+      drawYAxis(yScale, attr1);
+      drawLines(data, xScale, yScale, attr1, codeList);
+
+      yScale2 = makeYScale(data, maxField);
+      drawSecondYAxis(yScale2, attr2);
+      drawLines(data, xScale, yScale2, attr2, codeList);
+    }
   }
   // Different units, so keep whatever scale the unit has alone
   else if (selectedList.length>=1){
@@ -308,6 +317,10 @@ function initViz(codeList){
   }
 }
 
+// function initTracking(){
+//   window.analytics.startTrackerWithId('UA-76711924-2');
+// }
+
 //with callbakc 
 //updatePlantData();
 
@@ -317,7 +330,6 @@ $(document).ready(function() {
   var codeList = ["Moroceli"]; //list of currently chosen plants (by code)
   connectSyncButton();
   initViz(codeList);
-
 });
 
 //Wouldn't it be cool if they could sweep a vertical bar over the data and 
