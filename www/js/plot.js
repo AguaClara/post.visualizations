@@ -203,24 +203,25 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr){
         return yScale(d[attr_name]);
     })
     .defined(function(d) { 
-      return (!(isNaN(d[attr_name]) || d[attr_name]==null || d[attr_name]=="NaN")); 
+      return (!(isNaN(d[attr_name]) || d[attr_name]==null || d[attr_name]=="NaN" || isNaN(yScale(d[attr_name])))); 
     });  
+
 
   //Draw the line graph for each plant with code in codelist
   svg.selectAll("#linegraphline"+attr_name).remove();
+  if (lineGen(data)!=null){
+    //Check if this code was selected in order to draw it
+    plantCode = data[0].plant;
 
-  //Check if this code was selected in order to draw it
-  plantCode = data[0].plant;
-
-    svg.append('g').append("path")
-      .attr('d', lineGen(data))
-      .attr('stroke', function(){
-        return colors(attr_name); 
-      }) 
-      .attr('stroke-width', 2)
-      .attr('fill', 'none')
-      .attr("id", "linegraphline"+attr_name);
-  
+      svg.append('g').append("path")
+        .attr('d', lineGen(data))
+        .attr('stroke', function(){
+          return colors(attr_name); 
+        }) 
+        .attr('stroke-width', 2)
+        .attr('fill', 'none')
+        .attr("id", "linegraphline"+attr_name);
+  }  
 }       
 
 //if the same units, we want to know so we can use the same scale
@@ -233,7 +234,12 @@ function isSameUnits(codelist, units){
 function hasMaxScale(data, codelist){
   max1 = d3.max(data, function (d) {if (!isNaN(d[codelist[0]])){return d[codelist[0]]; }});
   max2 = d3.max(data, function (d) {if (!isNaN(d[codelist[1]])){return d[codelist[1]]; }});
-  if(max1 > max2){return codelist[0];} return codelist[1];
+  if(max1 > max2){return codelist[0];} 
+  else if(max2 > max1){return codelist[1];}
+  else if(max1==max2 && max1!=undefined){return codelist[0];} 
+  else if(max1!=undefined && max2==undefined){return codelist[0];}//Do separately because of awful JS handling of null type
+  else if(max1==undefined && max2!=undefined){return codelist[1];}
+  return null;
 }
 
 /* code = 
@@ -252,14 +258,16 @@ function drawPlot(data, code, selectedList, codeList){
     attr1 = selectedList[0];
     attr2 = selectedList[1];
     maxField = hasMaxScale(data, selectedList); //ID of the scale with the larger range.
-    
-    yScale = makeYScale(data, maxField); 
-    drawYAxis(yScale, attr1);
-    drawLines(data, xScale, yScale, attr1, codeList);
 
-    yScale2 = makeYScale(data, maxField);
-    drawSecondYAxis(yScale2, attr2);
-    drawLines(data, xScale, yScale2, attr2, codeList);
+    if (maxField!=null){
+      yScale = makeYScale(data, maxField); 
+      drawYAxis(yScale, attr1);
+      drawLines(data, xScale, yScale, attr1, codeList);
+
+      yScale2 = makeYScale(data, maxField);
+      drawSecondYAxis(yScale2, attr2);
+      drawLines(data, xScale, yScale2, attr2, codeList);
+    }
   }
   // Different units, so keep whatever scale the unit has alone
   else if (selectedList.length>=1){
