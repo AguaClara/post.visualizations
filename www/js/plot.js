@@ -330,6 +330,8 @@ $(document).ready(function() {
   var codeList = ["Moroceli"]; //list of currently chosen plants (by code)
   connectSyncButton();
   initViz(codeList);
+             
+
 });
 
 //Wouldn't it be cool if they could sweep a vertical bar over the data and 

@@ -151,3 +151,18 @@ function deleteOldPlantData(){
 	localStorage.clear();
 	save('plantName',plantName)
 };
+
+function getAllPlantsDict(){
+	return {
+		"aga":"Agalteca", 
+		"ala":"Alauca",
+		"ati":"Atima", 
+		"ccom":"Cuatro Comunidades", 
+		"doto":"Jesus de Otoro", 
+		"mar1":"Marcala", 
+		"moro":"Moroceli", 
+		"smat":"San Matias", 
+		"snic":"San Nicolas", 
+		"tam":"Tamara"
+	}
+};
