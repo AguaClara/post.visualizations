@@ -26,7 +26,7 @@ function encode_fusion_table_sql(sql_string) {
 // specify a column_string, this will return all of the columns
 function retrieveAllPlantData(column_string) {
 	var plantData = [];
-	if (localStorage.length == 0) {
+	if (localStorage.length <= number_of_data_points) {
 		return plantData
 	}
 	// Loop through selected localstorage held json strings
