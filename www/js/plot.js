@@ -327,7 +327,7 @@ function initViz(codeList){
 
 $(document).ready(function() { 
   //Hardcoded to just be Moroceli for now...
-  var codeList = ["Moroceli"]; //list of currently chosen plants (by code)
+  var codeList = [askForPlantName()]; //list of currently chosen plants (by code)
   connectSyncButton();
   initViz(codeList);
              

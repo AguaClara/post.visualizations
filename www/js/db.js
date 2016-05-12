@@ -162,7 +162,7 @@ function getAllPlantsDict(){
 		"ala":"Alauca",
 		"ati":"Atima", 
 		"ccom":"Cuatro Comunidades", 
-		"doto":"Jesus de Otoro", 
+		"doto":"Otoro", 
 		"mar1":"Marcala", 
 		"moro":"Moroceli", 
 		"smat":"San Matias", 
