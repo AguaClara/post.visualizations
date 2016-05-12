@@ -45,7 +45,10 @@
       <br><br>
       <!--<h1 class="header center orange-text">Wash4All</h1>-->
       <div class="row center">
-        <h4>Datos Sobre la Planta de Morocelí</h4>
+        <h4 id="datosHeader"></h4>
+        <script>
+        $("#datosHeader").html("Datos Sobre la Planta de "+askForPlantName());
+        </script>
         <h5 class="header col s12 light">Selecciona lo que desea visualizar.</h5>
       </div>
       <div id="headerContent"></div>
@@ -63,6 +66,51 @@
       </div>
 
       <br><br>
+      <!-- Modal Trigger -->
+      <div class="row center"><button class="btn modal-trigger" id="seleccionar">Seleccionar La Planta</button></a></div>
+
+      <!-- Modal Structure -->
+      <div id="modalPlants" class="modal">
+        <div class="modal-content">
+          <h4>Seleccionar La Planta</h4>
+          <p>Selecciona la planta que desea visualizar.</p>
+          <form action="." method="post" class="col s12">
+            <div class="input-field col s12"> 
+              <div id="allPlantsDropDown"> 
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <a id="closeModal" href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Enviar</a>
+        </div>
+      </div>
+
+      <script>
+      $(document).ready(function() {
+        $('select').material_select();
+      });
+      
+      $("#seleccionar").click(function(){
+        $('#modalPlants').openModal();
+      });
+
+      $("#closeModal").click(function(){
+        $('#modalPlants').closeModal();
+      });
+
+      allPlantsDict = getAllPlantsDict();
+      var dropdownHTML = ''; //'<option value="" disabled selected>Selecciona la opción.</option>';
+      for(var key in allPlantsDict){
+           // dropdownHTML += '<option value="'+key+'">'+allPlantsDict[key]+'</option>';
+           dropdownHTML +='<p><input name="plantSelection" type="radio" id="'+key+'" /><label for="'+key+'">'+allPlantsDict[key]+'</label></p>';
+      }
+      console.log(dropdownHTML);
+      $("#allPlantsDropDown").html(dropdownHTML);
+      
+      </script>
+
+
       <div class="row center"><a id='sync-viz' class="waves-effect waves-light btn">Sincronizar</a></div>
     
       <div class="row center" id="spinnerDestination">
