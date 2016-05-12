@@ -47,7 +47,10 @@
       <div class="row center">
         <h4 id="datosHeader"></h4>
         <script>
-        $("#datosHeader").html("Datos Sobre la Planta de "+askForPlantName());
+        var pname = askForPlantName();
+        if(pname != null){$("#datosHeader").html("Datos Sobre la Planta de "+pname);}
+        else{$("#datosHeader").html("Datos Sobre la Planta");}
+        
         </script>
         <h5 class="header col s12 light">Selecciona lo que desea visualizar.</h5>
       </div>
@@ -66,53 +69,49 @@
       </div>
 
       <br><br>
-      <!-- Modal Trigger -->
-      <div class="row center"><button class="btn modal-trigger" id="seleccionar">Seleccionar La Planta</button></a></div>
-
-      <!-- Modal Structure -->
-      <div id="modalPlants" class="modal">
-        <div class="modal-content">
-          <h4>Seleccionar La Planta</h4>
-          <p>Selecciona la planta que desea visualizar.</p>
-          <form action="." method="post" class="col s12">
-            <div class="input-field col s12"> 
-              <div id="allPlantsDropDown"> 
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <a id="closeModal" href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Enviar</a>
-        </div>
+      
+      <form method="post" action=".">
+      <div id="allPlantsDropDown"> 
       </div>
+           
 
       <script>
+       
+
       $(document).ready(function() {
-        $('select').material_select();
-      });
-      
-      $("#seleccionar").click(function(){
-        $('#modalPlants').openModal();
-      });
+        submitRadioValues = function(){
+          plantCode = $('input[name="plantSelection"]:checked').val();
+          save("plantName", plantCode);
+          $("#allPlantsDropDown").html("");
+          connectSyncButton();
+          codelist = [pdict[plantCode]];
+          initViz(codeList);
+          pdict = getAllPlantsDict();
+          $("#datosHeader").html("Datos Sobre la Planta de "+pdict[plantCode]);
+        }
 
-      $("#closeModal").click(function(){
-        $('#modalPlants').closeModal();
-      });
 
-      allPlantsDict = getAllPlantsDict();
-      var dropdownHTML = ''; //'<option value="" disabled selected>Selecciona la opción.</option>';
-      for(var key in allPlantsDict){
-           // dropdownHTML += '<option value="'+key+'">'+allPlantsDict[key]+'</option>';
-           dropdownHTML +='<p><input name="plantSelection" type="radio" id="'+key+'" /><label for="'+key+'">'+allPlantsDict[key]+'</label></p>';
-      }
-      console.log(dropdownHTML);
-      $("#allPlantsDropDown").html(dropdownHTML);
+        if (load("plantName")==undefined){
+          //No local storage
+          allPlantsDict = getAllPlantsDict();
+          var dropdownHTML = ''; 
+          for(var key in allPlantsDict){
+               dropdownHTML +='<p><input name="plantSelection" type="radio" id="'+key+'" value="'+key+'" /><label for="'+key+'">'+allPlantsDict[key]+'</label></p>';
+          }
+          dropdownHTML+='<br/><a class="waves-effect waves-light btn" id="nameSubmit" onClick="submitRadioValues()">Sincronizar</a>';
+          $("#allPlantsDropDown").html(dropdownHTML);
+          $("#syncButtonDiv").html("");
+
+        }else{
+          $("#syncButtonDiv").html("<a id='sync-viz' class='waves-effect waves-light btn'>Sincronizar</a>");
+        }
+      });
       
       </script>
 
 
-      <div class="row center"><a id='sync-viz' class="waves-effect waves-light btn">Sincronizar</a></div>
-    
+      <div class="row center" id="syncButtonDiv"><a id='sync-viz' class="waves-effect waves-light btn">Sincronizar</a></div>
+      
       <div class="row center" id="spinnerDestination">
       </div>
 

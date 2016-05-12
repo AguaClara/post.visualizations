@@ -144,7 +144,8 @@ function insertManyPlantData(plantData) {
 function checkForUpdate(){}
 
 function askForPlantName(){
-	return 'Moroceli'
+	if(load("plantName")==undefined){return null;}
+	return load("plantName");
 };
 function deleteOldPlantData(){
 	plantName = load('plantName')
