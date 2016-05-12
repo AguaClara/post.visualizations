@@ -11,12 +11,15 @@
 var table_id = "10IZcGT_2mHKS8cLOcvB_4BSj0LEFDKS5eJhPrGqE"
 var number_of_data_points = 100;
 
+// This is the number of things stored in localStorage that are not a row of Json data
+var number_of_non_data_storage_items = 2;
+
 function encode_fusion_table_sql(sql_string) {
 	var base_url = "https://www.googleapis.com/fusiontables/v2/";
 	var initiate_sql_query = "query?sql=";
 	var api_key = "&key=AIzaSyB9wik36h46yNJznjYjUTXHOu5py9anRFY";
-	sql_string = base_url + initiate_sql_query + encodeURIComponent(sql_string) + api_key;
-	return sql_string
+	url_string = base_url + initiate_sql_query + encodeURIComponent(sql_string) + api_key;
+	return url_string
 }
 
 // Get all the local plant data. If there is no plant data locally, this will return an empty list. If you don't 
@@ -28,12 +31,12 @@ function retrieveAllPlantData(column_string) {
 	}
 	// Loop through selected localstorage held json strings
 	if (column_string == undefined) {
-		for ( var i = 0, len = localStorage.length; i < len; ++i ) {	
+		for ( var i = 0; i < number_of_data_points; ++i ) {	
 			plantData[i] = JSON.parse(localStorage.getItem( localStorage.key( i ) ));
 		}
 	}
 	else {
-		for ( var i = 0, len = localStorage.length; i < len; ++i ) {
+		for ( var i = 0; i < number_of_data_points; ++i ) {
 			// Set default start and stop indices if left undefined
 			plantData[i] = JSON.parse(localStorage.getItem( localStorage.key( i ) ))[getColumnIndex(column_string)];
 		}
@@ -43,10 +46,10 @@ function retrieveAllPlantData(column_string) {
 
 // Load any string from local storage.
 function load(key) {
-	localStorage.getItem(key);
+	return localStorage.getItem(key);
 }
 
-// Load any string from local storage.
+// Save any string key, value pair to local storage
 function save(key, value) {
 	localStorage.setItem(key, value);
 }
@@ -75,19 +78,19 @@ function makeDictionary(rowArray, columnArray) {
 // The onSuccess(data) function must take in an array of data objects.
 // TODO: onFailure. 
 function updatePlantData(onSuccess, onFailure){
-	var codeList = [askForPlantName()]; //TODO not be hardcoded
+	var plantName = [load("plantName")];
 	var sql_query = "SELECT * FROM " + table_id + " order by timeFinished desc limit " + number_of_data_points;
 	sql_query_url = encode_fusion_table_sql(sql_query);
 	console.log(sql_query_url);
+	// Get the JSON corresponding to the encoded sql string
 	$.getJSON(sql_query_url, function(json) {
-		console.log(json);
-	})
-	$.getJSON(sql_query_url, function(json) {
-		localStorage.clear();
-		localStorage.setItem('columnData', JSON.stringify(json.columns));
+		deleteOldPlantData();
+		save('columnData', JSON.stringify(json.columns));
+		// Save plant data into the local storage
 		var plantDataDictArray = makeDictionary(json.rows, json.columns);
 		insertManyPlantData(plantDataDictArray);
-		onSuccess(plantDataDictArray,codeList);
+		// Call the callback and use the retrieve function to get plantdata
+		onSuccess(retrieveAllPlantData(),plantName);
 		$('#spinnerDestination').html("");
 	})
 	.fail(function() {
