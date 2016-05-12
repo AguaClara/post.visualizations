@@ -84,9 +84,9 @@
           save("plantName", plantCode);
           $("#allPlantsDropDown").html("");
           connectSyncButton();
+          pdict = getAllPlantsDict();
           codelist = [pdict[plantCode]];
           initViz(codeList);
-          pdict = getAllPlantsDict();
           $("#datosHeader").html("Datos Sobre la Planta de "+pdict[plantCode]);
         }
 
