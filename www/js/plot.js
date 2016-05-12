@@ -327,11 +327,9 @@ function initViz(codeList){
 
 $(document).ready(function() { 
   //Hardcoded to just be Moroceli for now...
-  var codeList = [askForPlantName()]; //list of currently chosen plants (by code)
-  connectSyncButton();
-  initViz(codeList);
-             
-
+  // var codeList = [askForPlantName()]; //list of currently chosen plants (by code)
+  // connectSyncButton();
+  // initViz(codeList);
 });
 
 //Wouldn't it be cool if they could sweep a vertical bar over the data and 
