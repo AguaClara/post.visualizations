@@ -97,7 +97,7 @@
              plantName = allPlantsDict[key];
              dropdownHTML +='<p><input name="plantSelection" type="radio" id="'+plantName+'" value="'+plantName+'"';
              if(askForPlantName()==plantName){ dropdownHTML+=" checked";}
-             dropdownHTML+='/><label for="'+plantName+'">'+plantName+'</label></p>';
+             dropdownHTML+='/><label for="'+plantName+'" class="checkboxtext">'+plantName+'</label></p>';
         }
         dropdownHTML+='<br/><a class="waves-effect waves-light btn" id="nameSubmit" onClick="submitRadioValues()">Enviar</a>';
         $("#allPlantsDropDown").html(dropdownHTML);
