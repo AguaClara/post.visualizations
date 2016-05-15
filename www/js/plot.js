@@ -92,20 +92,24 @@ function visualize(data, codeList) {
     data = data.filter(function(elem){return !isNaN(elem[key]) && elem[key]!=null && elem[key]!="NaN" && elem[key]!=""});
   }
   */
-  data = data.filter(function(elem){return ($.inArray(elem.plant, codeList)>-1) ;});
+  // data = data.filter(function(elem){return ($.inArray(elem.plant, codeList)>-1) ;});
   data = data.sort(sortByDateAscending);
   dataSave =data; //scoping is very important here!! GLOBAL VARIABLE
 
 
   colors = d3.scale.category10().domain( Object.keys(dataTypes) );
 
+  if (data.length==0){
+    height=0;width=0;
+  }
   svg = d3.select("#plot").append("svg")
     .attr("height", height)
-    .attr("width", width);  
+    .attr("width", width);
+
 
   preSelectedItem = makeCheckboxes();
   matches = [preSelectedItem];
-  drawPlot(dataSave, "Moroceli", matches); 
+  drawPlot(dataSave, getPlantName(), matches); 
   respondToCheckBox(codeList);
 }
 
@@ -195,6 +199,7 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr){
   if (second_attr == undefined) {
     second_attr = null;
   }
+
   var lineGen = d3.svg.line()
     .x(function(d) {
         return xScale(new Date(d.timeFinished));
@@ -249,6 +254,15 @@ function drawPlot(data, code, selectedList, codeList){
   svg.selectAll(".axis").remove();
   svg.selectAll("path").remove();
   svg.selectAll("text").remove();
+
+  if(data.length==0){
+    mensaje = "<br/><br/><br/><br/><h5 class='row center checkboxtext'>No hay datos para visualizar "+
+    "ahora.</h5><h5 class='row center light checkboxtext'>¿Por qué no trata visualizar otra planta?</h5>"+
+    "<div class='row center'><a href='./settings.html' class='waves-effect waves-light btn'>Manejar Ajustes</a></div>"+
+    "<br/><br/><br/><h5 class='row center light checkboxtext'>O trata otra vez para obtener datos:</h5>";
+    $("#visualizer").html(mensaje);
+    return;
+  }
 
   xScale = makeXScale(data);
   drawXAxis(xScale);
@@ -305,7 +319,7 @@ function respondToCheckBox(codeList){
       $('#'+m).prop("checked", true);
     });
 
-    drawPlot(filtered, "Moroceli", matches, codeList);
+    drawPlot(filtered, getPlantName(), matches, codeList);
   });
 }
 
@@ -313,7 +327,6 @@ function initViz(codeList){
   data = retrieveAllPlantData();
   if (data.length > 0) {
     visualize(data, codeList);
-  }else{
   }
 }
 
@@ -327,9 +340,9 @@ function initViz(codeList){
 
 $(document).ready(function() { 
   //Hardcoded to just be Moroceli for now...
-  var codeList = ["Moroceli"]; //list of currently chosen plants (by code)
-  connectSyncButton();
-  initViz(codeList);
+  // var codeList = [askForPlantName()]; //list of currently chosen plants (by code)
+  // connectSyncButton();
+  // initViz(codeList);
 });
 
 //Wouldn't it be cool if they could sweep a vertical bar over the data and 
