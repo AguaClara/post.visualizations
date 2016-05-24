@@ -92,15 +92,22 @@ function updatePlantData(onSuccess, onFailure){
 	console.log(sql_query_url);
 	// Get the JSON corresponding to the encoded sql string
 	$.getJSON(sql_query_url, function(json) {
+		console.log(sql_query_url);
 		deleteOldPlantData();
 		save('columnData', JSON.stringify(json.columns));
 		// Save plant data into the local storage
-		var plantDataDictArray = makeDictionary(json.rows, json.columns);
-		number_of_returned_data_points = json.rows.length;
-		insertManyPlantData(plantDataDictArray);
-		// Call the callback and use the retrieve function to get plantdata
-		onSuccess(retrieveAllPlantData(),plantName);
-		$('#spinnerDestination').html("");
+		if (json.rows == null){
+			json.rows = [];
+			json.columns = [];
+		}
+		//else {
+			var plantDataDictArray = makeDictionary(json.rows, json.columns);
+			number_of_returned_data_points = json.rows.length;
+			insertManyPlantData(plantDataDictArray);
+			// Call the callback and use the retrieve function to get plantdata
+			onSuccess(retrieveAllPlantData(),plantName);
+			$('#spinnerDestination').html("");
+		//}
 	})
 	.fail(function() {
 		alert('Could not sync data. Data sync was not successful and old data is preserved.')
