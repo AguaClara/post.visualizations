@@ -84,6 +84,7 @@ function updatePlantData(onSuccess, onFailure){
 	console.log(sql_query_url);
 	// Get the JSON corresponding to the encoded sql string
 	$.getJSON(sql_query_url, function(json) {
+		console.log(sql_query_url);
 		deleteOldPlantData();
 		save('columnData', JSON.stringify(json.columns));
 		// Save plant data into the local storage
