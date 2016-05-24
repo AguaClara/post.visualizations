@@ -71,7 +71,7 @@
 
       $(document).ready(function() {
         $("#currentChoice").html(function(){
-          pname = getPlantName();
+          pname = askForPlantName();
           if (pname!=null){return "Presentemente, su selección es: " +  pname;}
           return "Ahora no hay selección de planta."
         }
@@ -82,7 +82,7 @@
           plantCode = $('input[name="plantSelection"]:checked').val();
           save("plantName", plantCode);
           $("#currentChoice").html(function(){
-            pname = getPlantName();
+            pname = askForPlantName();
             if (pname!=null){return "Presentemente, su selección es: " +  pname;}
             return "Ahora no hay selección de planta."
           });
@@ -96,7 +96,7 @@
         for(var key in allPlantsDict){
              plantName = allPlantsDict[key];
              dropdownHTML +='<p><input name="plantSelection" type="radio" id="'+plantName+'" value="'+plantName+'"';
-             if(getPlantName()==plantName){ dropdownHTML+=" checked";}
+             if(askForPlantName()==plantName){ dropdownHTML+=" checked";}
              dropdownHTML+='/><label for="'+plantName+'" class="checkboxtext">'+plantName+'</label></p>';
         }
         dropdownHTML+='<br/><a class="waves-effect waves-light btn" id="nameSubmit" onClick="submitRadioValues()">Enviar</a>';

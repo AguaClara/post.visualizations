@@ -9,15 +9,7 @@
 // pre- and post- conditions
 
 var table_id = "10IZcGT_2mHKS8cLOcvB_4BSj0LEFDKS5eJhPrGqE"
-var number_of_requested_data_points = 100;
-
-// We only know how many data points there are for a specific plant request when we actually get the response
-// but in that response there may be some duplicates that we only discover when putting into the localStorage...
-// we should be ensuring that there are no duplicates on the server, but for now Fusion Tables doesn't support this:
-// https://code.google.com/p/fusion-tables/issues/detail?can=2&start=0&num=100&q=&colspec=ID%20Type%20Status%20Summary%20Stars%20Component&groupby=&sort=&id=490
-// and therefore we just have to update this value two times, one to figure out how many times to insert into localstorage,
-// and one to determine how many times to retrieve an item. 
-var number_of_returned_data_points = 0;
+var number_of_data_points = 100;
 
 // This is the number of things stored in localStorage that are not a row of Json data
 var number_of_non_data_storage_items = 2;
@@ -34,17 +26,17 @@ function encode_fusion_table_sql(sql_string) {
 // specify a column_string, this will return all of the columns
 function retrieveAllPlantData(column_string) {
 	var plantData = [];
-	if (localStorage.length <= number_of_non_data_storage_items) {
+	if (localStorage.length <= number_of_data_points) {
 		return plantData
 	}
 	// Loop through selected localstorage held json strings
 	if (column_string == undefined) {
-		for ( var i = 0; i < number_of_returned_data_points; ++i ) {	
+		for ( var i = 0; i < number_of_data_points; ++i ) {	
 			plantData[i] = JSON.parse(localStorage.getItem( localStorage.key( i ) ));
 		}
 	}
 	else {
-		for ( var i = 0; i < number_of_returned_data_points; ++i ) {
+		for ( var i = 0; i < number_of_data_points; ++i ) {
 			// Set default start and stop indices if left undefined
 			plantData[i] = JSON.parse(localStorage.getItem( localStorage.key( i ) ))[getColumnIndex(column_string)];
 		}
@@ -86,8 +78,8 @@ function makeDictionary(rowArray, columnArray) {
 // The onSuccess(data) function must take in an array of data objects.
 // TODO: onFailure. 
 function updatePlantData(onSuccess, onFailure){
-	var plantName = getPlantName();
-	var sql_query = "SELECT * FROM " + table_id + " WHERE plant=" + "'" + plantName + "'" + " ORDER BY timeFinished DESC LIMIT " + number_of_requested_data_points;
+	var plantName = [load("plantName")];
+	var sql_query = "SELECT * FROM " + table_id + " order by timeFinished desc limit " + number_of_data_points;
 	sql_query_url = encode_fusion_table_sql(sql_query);
 	console.log(sql_query_url);
 	// Get the JSON corresponding to the encoded sql string
@@ -96,7 +88,6 @@ function updatePlantData(onSuccess, onFailure){
 		save('columnData', JSON.stringify(json.columns));
 		// Save plant data into the local storage
 		var plantDataDictArray = makeDictionary(json.rows, json.columns);
-		number_of_returned_data_points = json.rows.length;
 		insertManyPlantData(plantDataDictArray);
 		// Call the callback and use the retrieve function to get plantdata
 		onSuccess(retrieveAllPlantData(),plantName);
@@ -112,15 +103,15 @@ function updatePlantData(onSuccess, onFailure){
 // ----------------------------------------Private Methods/script------------------------------------------
 // This part of the script is used internally. 
 
-// Initialize the sync button
+
 function connectSyncButton() {
 	$('#sync-viz').click(function() {
-		var codeList = [getPlantName()];
+		var codeList = [askForPlantName()];
 		addSpinner('#spinnerDestination');
 		updatePlantData(visualize, codeList);
 	});
 	$('#sync-table').click(function(){
-		var codeList = [getPlantName()];
+		var codeList = [askForPlantName()];
 		addSpinner('#spinnerDestination');
 		updatePlantData(settable, codeList);
 	});
@@ -148,19 +139,21 @@ function insertManyPlantData(plantData) {
 	for ( var i = 0, len = plantData.length; i < len; ++i ) {
 		localStorage.setItem(plantData[i].timeStarted, JSON.stringify(plantData[i]));
 	}
-	number_of_returned_data_points = localStorage.length - number_of_non_data_storage_items;
 }
 
-// Delete all plant data without losing the persistant data like plantname
+//TODO Functions
+
+// Asynchronous function to update the locally stored plant data. 
+function checkForUpdate(){}
+
+function askForPlantName(){
+	if(load("plantName")==undefined){return null;}
+	return load("plantName");
+};
 function deleteOldPlantData(){
 	plantName = load('plantName')
 	localStorage.clear();
 	save('plantName',plantName)
-};
-
-function getPlantName(){
-	if(load("plantName")==undefined){return null;}
-	return load("plantName");
 };
 
 function getAllPlantsDict(){

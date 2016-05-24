@@ -92,7 +92,7 @@ function visualize(data, codeList) {
     data = data.filter(function(elem){return !isNaN(elem[key]) && elem[key]!=null && elem[key]!="NaN" && elem[key]!=""});
   }
   */
-  // data = data.filter(function(elem){return ($.inArray(elem.plant, codeList)>-1) ;});
+  data = data.filter(function(elem){return ($.inArray(elem.plant, codeList)>-1) ;});
   data = data.sort(sortByDateAscending);
   dataSave =data; //scoping is very important here!! GLOBAL VARIABLE
 
@@ -109,7 +109,7 @@ function visualize(data, codeList) {
 
   preSelectedItem = makeCheckboxes();
   matches = [preSelectedItem];
-  drawPlot(dataSave, getPlantName(), matches); 
+  drawPlot(dataSave, "Moroceli", matches); 
   respondToCheckBox(codeList);
 }
 
@@ -319,7 +319,7 @@ function respondToCheckBox(codeList){
       $('#'+m).prop("checked", true);
     });
 
-    drawPlot(filtered, getPlantName(), matches, codeList);
+    drawPlot(filtered, "Moroceli", matches, codeList);
   });
 }
 
