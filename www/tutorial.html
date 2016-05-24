@@ -32,15 +32,15 @@
       <ul class="right hide-on-med-and-down">
         <li ><a href="./index.html">Gráficos</a></li>
         <li ><a href="./table.html">Tablas</a></li>
-        <li><a href="./tutorial.html">Tutorial</a></li>
-        <li class="active"><a href="./settings.html">Manejar Ajustes</a></li>
+        <li class="active"><a href="./tutorial.html">Tutorial</a></li>
+        <li><a href="./settings.html">Ajustes</a></li>
       </ul>
 
       <ul id="nav-mobile" class="side-nav">
         <li ><a href="./index.html">Gráficos</a></li>
         <li ><a href="./table.html">Tablas</a></li>
-        <li><a href="./tutorial.html">Tutorial</a></li>
-        <li class="active"><a href="./settings.html">Manejar Ajustes</a></li>
+        <li class="active"><a href="./tutorial.html">Tutorial</a></li>
+        <li ><a href="./settings.html">Ajustes</a></li>
       </ul>
     </div>
   </nav>
@@ -49,8 +49,8 @@
       <br><br>
       <!--<h1 class="header center orange-text">Wash4All</h1>-->
       <div class="row center">
-        <h4 id="datosHeader">Manejar Ajustes</h4>
-        <h5 class="header col s12 light">Seleccione la planta los datos de que desea visualizar.</h5>
+        <h4 id="datosHeader">Tutorial</h4>
+        <h5 class="header col s12 light">Aprenda como entender los gráficos, y navigar la aplicación.</h5>
       </div>
       <div id="headerContent"></div>
       <div class="container">
@@ -63,56 +63,7 @@
       <div class="section">
       </div>
       <h5 class="header col s12 light" id="currentChoice"></h5>
-      <form method="post" action=".">
-      <div id="allPlantsDropDown"> 
-      </div>
-           
 
-      <script>
-       
-
-      $(document).ready(function() {
-        $("#currentChoice").html(function(){
-          pname = getPlantName();
-          if (pname!=null){return "Presentemente, su selección es: " +  pname;}
-          return "Ahora no hay selección de planta."
-        }
-        );
-
-        submitRadioValues = function(){
-          addSpinner('#spinnerDestination');
-          plantCode = $('input[name="plantSelection"]:checked').val();
-          save("plantName", plantCode);
-          $("#currentChoice").html(function(){
-            pname = getPlantName();
-            if (pname!=null){return "Presentemente, su selección es: " +  pname;}
-            return "Ahora no hay selección de planta."
-          });
-          setTimeout(function(){$('#spinnerDestination').html("");},500);
-          window.location.replace('index.html');
-          
-        }
-
-        //No local storage
-        allPlantsDict = getAllPlantsDict();
-        var dropdownHTML = ''; 
-        for(var key in allPlantsDict){
-             plantName = allPlantsDict[key];
-             dropdownHTML +='<p><input name="plantSelection" type="radio" id="'+plantName+'" value="'+plantName+'"';
-             if(getPlantName()==plantName){ dropdownHTML+=" checked";}
-             dropdownHTML+='/><label for="'+plantName+'" class="checkboxtext">'+plantName+'</label></p>';
-        }
-        dropdownHTML+='<br/><a class="waves-effect waves-light btn" id="nameSubmit" onClick="submitRadioValues()">Enviar</a>';
-        $("#allPlantsDropDown").html(dropdownHTML);
-      });
-      
-      </script>
-      
-      <div class="row center" id="spinnerDestination">
-      </div>
-
-      <br/><br/>
-      <div class="row center"><a class="waves-effect waves-light btn" href="./index.html">Volver para ver gráficos</a></div>
     </div>
     
     <div class="section"></div>
