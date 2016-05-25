@@ -1,4 +1,3 @@
-//The following two assignments are used for Spanish date fomrmatting
 var es_ES = {
   "decimal": ",",
   "thousands": ".",
@@ -17,10 +16,8 @@ var es_ES = {
 var ES = d3.locale(es_ES);
 
 var colors; 
-var purposeTag = "plantData"; //Entries with this tag are defined with numerical values (aren't test values)
+var purposeTag = "plantData"; //These will be defined with numerical values
 
-
-//Information about plants/their locations
 var plantCoords = [
   {"lat": 14.446363, "longi" : -87.265564, "name":"Agalteca", "code":"aga"},
   {"lat": 13.852931, "longi" : -86.685029, "name":"Alauca","code":"ala"},
@@ -34,8 +31,6 @@ var plantCoords = [
   {"lat": 14.189934, "longi" : -87.331426, "name":"Tamara", "code":"tam"}
 ];
 
-
-//Map from keys in the table to units
 var units = {
  "rawWaterTurbidity":"NTU",
  "settledWaterTurbidity":"NTU",
@@ -44,7 +39,6 @@ var units = {
  "filteredWaterTurbidity":"NTU"
 };
 
-//Map from keys in the table to Spanish text
 var dataTypes = {
  "rawWaterTurbidity":"Turbiedad de agua cruda",
  "settledWaterTurbidity":"Turbiedad de agua decantada",
@@ -56,7 +50,7 @@ var dataSave;
 var svg;
 var matches; //Currently selected checkboxes
 
-/* Create plot */
+/* Create plot .........................................................*/
 var height = 350;
 var width = 290;
 var plot_padding_right = 45;
@@ -64,12 +58,12 @@ var plot_padding_left = 45;
 var plot_padding_bottom = 72;
 var plot_padding_top = 20;
 
-/* Create and draw axes */
+/* Create and draw axes ................................................*/
 var xScale; var yScale; var xAxis; var yAxis0;
 var xMin;
 var xMax;
 
-/*Add togglable checkboxes to page*/
+//Add togglable checkboxes to page
 function makeCheckboxes(){
   selected = "";
   var formText = "<form action='.'>";
@@ -87,8 +81,7 @@ function makeCheckboxes(){
   return selected;
 }
 
-/* Visualize function sorts the data and redraws the plot. To be used when the 
-localStorage is updated. */
+// visualize function sorts the data and redraws the plot. To be used when the localStorage is updated. 
 function visualize(data, codeList) { 
   // empty any previous plot
   $('#plot').empty();
@@ -103,30 +96,29 @@ function visualize(data, codeList) {
   data = data.sort(sortByDateAscending);
   dataSave =data; //scoping is very important here!! GLOBAL VARIABLE
 
-  //Create a color scale: each type of data has its own color
+
   colors = d3.scale.category10().domain( Object.keys(dataTypes) );
 
-
   if (data.length==0){
-    height=0;width=0; //Hide the plot if nothing to visualize
+    height=0;width=0;
   }
   svg = d3.select("#plot").append("svg")
     .attr("height", height)
     .attr("width", width);
 
-  preSelectedItem = makeCheckboxes(); //Preselect one item to demo use to users
+
+  preSelectedItem = makeCheckboxes();
   matches = [preSelectedItem];
   drawPlot(dataSave, "Moroceli", matches); 
   respondToCheckBox(codeList);
 }
 
-/* Sort input data by date*/
+/* Sort input data by date .............................................*/
 function sortByDateAscending(a, b) {
   // Dates will be cast to numbers automagically:
   return new Date(a.timeFinished) - new Date(b.timeFinished);
 }
 
-/* Create a d3 scale spanning the dates of the selected range */
 makeXScale = function(data){
   //Can take first and last because they are already sorted
   xMin = new Date(data[0].timeFinished);
@@ -137,7 +129,6 @@ makeXScale = function(data){
   return xScale;
 }
 
-/*Create and draw a labeled x axis */
 drawXAxis = function(xScale){
   var xAxis = d3.svg.axis()
     .scale(xScale)
@@ -163,8 +154,6 @@ drawXAxis = function(xScale){
     .text("Fecha");
 }
 
-/*Create a y scale for the dimension attr_name, dynamically sizing to the min/max 
-of data present */
 makeYScale = function(data, attr_name){
   var yScale = d3.scale.linear()
     .domain([0, d3.max(data, function (d) {if (!isNaN(d[attr_name])){return d[attr_name]; }})])
@@ -172,7 +161,6 @@ makeYScale = function(data, attr_name){
   return yScale;
 }
 
-/*Create and draw a labeled y axis on the left side of the plot*/
 drawYAxis = function(yScale, attr_name){
   var yAxis = d3.svg.axis().scale(yScale).orient("left");
   svg.append("g")
@@ -189,7 +177,6 @@ drawYAxis = function(yScale, attr_name){
     .attr("fill",  colors(attr_name));
 }
 
-/*Create and draw a labeled y axis on the right side of the plot*/
 drawSecondYAxis = function(yScale, attr_name){
   var yAxis = d3.svg.axis().scale(yScale).orient("right");
   svg.append("g")
@@ -207,7 +194,7 @@ drawSecondYAxis = function(yScale, attr_name){
     .attr("fill",  colors(attr_name));
 }
 
-/* Make the line graph */
+/* Make the line graph .................................................*/
 function drawLines(data, xScale, yScale, attr_name, codeList, second_attr){
   if (second_attr == undefined) {
     second_attr = null;
@@ -221,7 +208,6 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr){
         return yScale(d[attr_name]);
     })
     .defined(function(d) { 
-      //If false, these datapoints will be omitted from the graph. Don't want to include nulls/NaNs
       return (!(isNaN(d[attr_name]) || d[attr_name]==null || d[attr_name]=="NaN" || isNaN(yScale(d[attr_name])))); 
     });  
 
@@ -235,7 +221,7 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr){
       svg.append('g').append("path")
         .attr('d', lineGen(data))
         .attr('stroke', function(){
-          return colors(attr_name); //Color the line
+          return colors(attr_name); 
         }) 
         .attr('stroke-width', 2)
         .attr('fill', 'none')
@@ -243,13 +229,13 @@ function drawLines(data, xScale, yScale, attr_name, codeList, second_attr){
   }  
 }       
 
-/*If the same units, we want to know so we can use the same scale
-  codelist has two items and they are the same*/
+//if the same units, we want to know so we can use the same scale
+//codelist has two items and they are the same
 function isSameUnits(codelist, units){
   return codelist.length==2 && units[codelist[0]]==units[codelist[1]];
 }
 
-/* Return the name of the field that has the larger scale */
+//return the name of the field that has the larger scale
 function hasMaxScale(data, codelist){
   max1 = d3.max(data, function (d) {if (!isNaN(d[codelist[0]])){return d[codelist[0]]; }});
   max2 = d3.max(data, function (d) {if (!isNaN(d[codelist[1]])){return d[codelist[1]]; }});
@@ -261,10 +247,8 @@ function hasMaxScale(data, codelist){
   return null;
 }
 
-/* Draw the plot of data using the dimensions that were checked (in selectedList)
-  for the plants in codeList
-  code = Yo this might be leftover crap
-  selectedList = len 1 or 2 of checkboxes that have been checked
+/* code = 
+ * selectedList = len 1 or 2 of checkboxes that have been checked
  */
 function drawPlot(data, code, selectedList, codeList){
   svg.selectAll(".axis").remove();
@@ -272,7 +256,6 @@ function drawPlot(data, code, selectedList, codeList){
   svg.selectAll("text").remove();
 
   if(data.length==0){
-    //Present a message explaining there is no data
     mensaje = "<br/><br/><br/><br/><h5 class='row center checkboxtext'>No hay datos para visualizar "+
     "ahora.</h5><h5 class='row center light checkboxtext'>¿Por qué no trata visualizar otra planta?</h5>"+
     "<div class='row center'><a href='./settings.html' class='waves-effect waves-light btn'>Manejar Ajustes</a></div>"+
@@ -318,8 +301,6 @@ function drawPlot(data, code, selectedList, codeList){
   }
 }
 
-/*Gather the checkboxes that are checked and add them to the matches list
-  with the limitation that there can only be two at a time. LRU eviction */
 function respondToCheckBox(codeList){
   $(".filled-in").on("click", function() {
     if ($.inArray(this.value, matches)==-1){
@@ -342,7 +323,6 @@ function respondToCheckBox(codeList){
   });
 }
 
-/*Fetch data and create a visualization*/
 function initViz(codeList){
   data = retrieveAllPlantData();
   if (data.length > 0) {
@@ -359,6 +339,7 @@ function initViz(codeList){
 
 
 $(document).ready(function() { 
+  //Hardcoded to just be Moroceli for now...
   // var codeList = [askForPlantName()]; //list of currently chosen plants (by code)
   // connectSyncButton();
   // initViz(codeList);
