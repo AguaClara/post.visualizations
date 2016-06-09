@@ -298,6 +298,116 @@ function drawPlot(data, code, selectedList, codeList){
       drawSecondYAxis(yScale2, attr2);
       drawLines(data, xScale, yScale2, attr2, codeList);
     }
+    else {
+      attr2 = null;
+    }
+
+  }
+  
+  drawSlider(data,attr1,attr2);  
+
+  //get values
+
+}
+
+//get date object in [arr] closest to [date]
+function nearestDate(date, arr) {
+    var curr = arr[0];
+    var diff = Math.abs (date - curr);
+    for (var val = 0; val < arr.length; val++) {
+        var newdiff = Math.abs (date - arr[val]);
+        if (newdiff < diff) {
+            diff = newdiff;
+            curr = arr[val];
+        }
+    }
+    return curr;
+}
+
+//draw slider for focusing on specific date/value pairs
+function drawSlider(data,attr1,attr2){
+  //clear residual slider
+  d3.selectAll(".sSlider,.sHandle").remove();
+
+  //get a new array with date values of each datum
+  var a = data.map(function(d) { return new Date(d.timeFinished); });
+  var dateDomain = a;
+
+  var x = xScale;
+
+  //use d3.brush to create a range input
+  var brush = d3.svg.brush()
+      .x(x)
+      .extent([xMin, xMax])
+      .on("brush", brushed);
+  var slider = svg.append("g")
+      .attr("class", "sSlider")
+      .call(brush);
+  slider.selectAll(".extent,.resize")
+      .remove();
+  var handle = slider.append("circle")
+      .attr("class", "sHandle")
+      .attr("transform", "translate(0," + (height-plot_padding_bottom) + ")")
+      .attr("r", 9);
+  slider.call(brush.event)
+      .transition()
+      .duration(750)
+      .call(brush.extent([xMin,xMin]))
+      .call(brush.event);
+
+  //get current value of slider, snap to nearest date, draw focus bars
+  function brushed() {
+    var value = brush.extent()[0];
+    if (d3.event.sourceEvent) { // not a programmatic event
+      value = x.invert(d3.mouse(this)[0]);
+      brush.extent([value, value]);
+    }
+    var nearest = nearestDate(value, dateDomain);
+    handle.attr("cx", x(nearest));
+    d3.selectAll("#sliderLine").remove();
+    svg.append('g').attr("id", "sliderLine")
+        .append("line")
+        .attr('x1', x(nearest))
+        .attr('x2', x(nearest))
+        .attr('y1', 0)
+        .attr('y2', height - plot_padding_bottom)
+        .attr('stroke', 'black') 
+        .attr('stroke-width', 1)
+        .attr('fill', 'none')
+        .attr("id", "sliderLine");;
+
+    drawFocusHorizon(nearest, dateDomain, data, attr1, attr2);
+  }
+}
+
+function drawFocusHorizon(value, dates, data, attr1, attr2){
+  var dateCorrespondence = value;
+  var indexCorrespondence = dates.indexOf(dateCorrespondence);
+  var yObject = data[indexCorrespondence];
+  var yDatum1 = +yObject[attr1];
+  console.log("date: " + value.toString());
+  console.log("value1: " + String(yDatum1));
+  svg.append('g').append("line")
+    .attr('x1', plot_padding_left)
+    .attr('x2', width - plot_padding_right)
+    .attr('y1', yScale(yDatum1))
+    .attr('y2', yScale(yDatum1))
+    .attr('stroke', 'black') 
+    .attr('stroke-width', 1)
+    .attr('fill', 'none')
+    .attr("id", "sliderLine");
+  if (attr2 != null){
+    var yDatum2 = +yObject[attr2];
+    svg.append('g').append("line")
+      .attr('x1', plot_padding_left)
+      .attr('x2', width - plot_padding_right)
+      .attr('y1', yScale2(yDatum2))
+      .attr('y2', yScale2(yDatum2))
+      .attr('stroke', 'black') 
+      .attr('stroke-width', 1)
+      .attr('fill', 'none')
+      .attr("id", "sliderLine");
+      console.log("value2: " + String(yDatum2));
   }
 }
 
