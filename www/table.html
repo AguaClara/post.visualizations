@@ -48,7 +48,14 @@
       <br><br>
       <!--<h1 class="header center orange-text">Wash4All</h1>-->
       <div class="row center">
-        <h4>Datos Sobre la Planta de Morocelí</h4>
+        <h4 id="datosHeader"></h4>
+        <script>
+        var pname = getPlantName();
+        if(pname != null){$("#datosHeader").html("Datos Sobre la Planta de "+pname);}
+        else{$("#datosHeader").html("Datos Sobre la Planta");}
+        
+        </script>
+        <h5 class="header col s12 light">Selecciona lo que desea visualizar.</h5>
         <h5 class="header col s12 light">Explora las tablas de datos de los últimos 7 días.</h5>
         
       </div>
