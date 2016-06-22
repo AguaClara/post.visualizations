@@ -49,6 +49,8 @@ var dataTypes = {
 var dataSave;
 var svg;
 var matches; //Currently selected checkboxes
+var div1; //tooltip divs
+var div2;
 
 /* Create plot .........................................................*/
 var height = 350;
@@ -105,6 +107,17 @@ function visualize(data, codeList) {
   svg = d3.select("#plot").append("svg")
     .attr("height", height)
     .attr("width", width);
+  if (data.length != 0){
+    // Define the div for the tooltip
+    div1 = d3.select("#plot").append("div") 
+        .attr("class", "tooltip")
+        .attr("id", 'div1')       
+        .style("opacity", 0);
+    div2 = d3.select("#plot").append("div") 
+        .attr("class", "tooltip")       
+        .attr("id", 'div2')
+        .style("opacity", 0);
+  }
 
 
   preSelectedItem = makeCheckboxes();
@@ -304,7 +317,7 @@ function drawPlot(data, code, selectedList, codeList){
 
   }
   
-  drawSlider(data,attr1,attr2);  
+  drawSlider(data);  
 
   //get values
 
@@ -325,7 +338,7 @@ function nearestDate(date, arr) {
 }
 
 //draw slider for focusing on specific date/value pairs
-function drawSlider(data,attr1,attr2){
+function drawSlider(data){
   //clear residual slider
   d3.selectAll(".sSlider,.sHandle").remove();
 
@@ -376,11 +389,25 @@ function drawSlider(data,attr1,attr2){
         .attr('fill', 'none')
         .attr("id", "sliderLine");;
 
-    drawFocusHorizon(nearest, dateDomain, data, attr1, attr2);
+    //drawFocusHorizon(nearest, dateDomain, data, attr1, attr2);
+    div1.remove();
+    div2.remove();
+    if (data.length != 0){
+      // Define the div for the tooltip
+      div1 = d3.select("#plot").append("div") 
+          .attr("class", "tooltip")
+          .attr("id", 'div1')       
+          .style("opacity", 0);
+      div2 = d3.select("#plot").append("div") 
+          .attr("class", "tooltip")       
+          .attr("id", 'div2')
+          .style("opacity", 0);
+    }
+    drawTooltip(nearest, dateDomain, data);
   }
 }
 
-function drawFocusHorizon(value, dates, data, attr1, attr2){
+function drawFocusHorizon(value, dates, data){
   var dateCorrespondence = value;
   var indexCorrespondence = dates.indexOf(dateCorrespondence);
   var yObject = data[indexCorrespondence];
@@ -408,6 +435,77 @@ function drawFocusHorizon(value, dates, data, attr1, attr2){
       .attr('fill', 'none')
       .attr("id", "sliderLine");
       console.log("value2: " + String(yDatum2));
+  }
+}
+
+function drawDiv(x, y, d, attr){
+  d.transition()    
+    .duration(200)    
+    .style("opacity", .9);    
+  d.html(x.getDate() + ' ' + es_ES['shortMonths'][x.getMonth()] + ' ' + x.toTimeString().substring(0,8) + "<br/>"  + String(y))  
+    .style("left", (plot.left + xScale(x)) + "px")   
+    .style("top", (plot.top + yScale(y) - plot_padding_bottom) + "px")
+    .style('background', function(){
+      return colors(attr); 
+    });
+}
+
+function collision(div1, div2) {
+      var x1 = div1.offset().left;
+      var y1 = div1.offset().top;
+      var h1 = div1.outerHeight(true);
+      var w1 = div1.outerWidth(true);
+      var b1 = y1 + h1;
+      var r1 = x1 + w1;
+      var x2 = div2.offset().left;
+      var y2 = div2.offset().top;
+      var h2 = div2.outerHeight(true);
+      var w2 = div2.outerWidth(true);
+      var b2 = y2 + h2;
+      var r2 = x2 + w2;
+
+      if (b1 < y2 || y1 > b2 || r1 < x2 || x1 > r2) return false;
+      return true;
+    }
+
+function drawTooltip(value, dates, data) {
+  var dateCorrespondence = value;
+  var indexCorrespondence = dates.indexOf(dateCorrespondence);
+  var yObject = data[indexCorrespondence];
+  var yDatum1 = +yObject[attr1];
+  var plot = $("#plot").position();
+  value = new Date(value);
+  // drawDiv(value, yDatum1, div1, attr1)
+  // if (attr2 != null){
+  //   var yDatum2 = +yObject[attr2];
+  //   div1 = d3.select("#div2");
+  //   drawDiv(value, yDatum2, div2, attr2);
+  // }
+  div1.transition()    
+    .duration(750)    
+    .style("opacity", .9);    
+  div1.html(value.getDate() + ' ' + es_ES['shortMonths'][value.getMonth()] + ' ' + value.toTimeString().substring(0,8) + "<br/>"  + String(yDatum1))  
+    .style("left", (plot.left + xScale(value)) + "px")   
+    .style("top", (plot.top + yScale(yDatum1) - plot_padding_bottom) + "px")
+    .style('background', function(){
+      return colors(attr1); 
+    });
+  if (attr2 != null){
+    var yDatum2 = +yObject[attr2];
+    div2.transition()    
+      .duration(750)    
+      .style("opacity", .9);    
+    div2.html(value.getDate() + ' ' + es_ES['shortMonths'][value.getMonth()] + ' ' + value.toTimeString().substring(0,8) + "<br/>"  + String(yDatum2))  
+      .style("left", (plot.left + xScale(value)) + "px") 
+      .style("top", (plot.top + yScale2(yDatum2) - plot_padding_bottom) + "px")
+      .style('background', function(){
+        return colors(attr2); 
+      });
+    var overlap = collision($("#div1"), $("#div2"));
+    console.log(overlap);
+    if (overlap) {
+      div1.style("top", (plot.top + yScale2(yDatum2) - plot_padding_bottom - 46) + "px")
+    }
   }
 }
 
