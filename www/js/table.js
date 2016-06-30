@@ -59,6 +59,12 @@ function settable(data, codeList){
                     .append("table")
                       .attr("id","table2")
                       .attr("class","centered striped responsive-table");
+
+  var graph = d3.select("#container3")
+                    .append("section")
+                    .append("graph")
+                    .attr('id', 'graph1')
+                    .attr("class", "");
   // for(var i in tabledata){
   //   console.log(i);
   //   console.log(tabledata[i]);
@@ -119,6 +125,9 @@ function settable(data, codeList){
   }
   // console.log(tabledata.length);
   // console.log(count);
+
+  //Make graph here
+  
 }
 
 
