@@ -502,7 +502,7 @@ function drawTooltip(value, dates, data) {
         return colors(attr2); 
       });
     var overlap = collision($("#div1"), $("#div2"));
-    console.log(overlap);
+    //console.log(overlap);
     if (overlap) {
       div1.style("top", (plot.top + yScale2(yDatum2) - plot_padding_bottom - 46) + "px")
     }
