@@ -94,6 +94,10 @@ function updatePlantData(onSuccess, onFailure){
 	$.getJSON(sql_query_url, function(json) {
 		deleteOldPlantData();
 		save('columnData', JSON.stringify(json.columns));
+		if (json.rows == null){
+			json.rows = [];
+			json.columns = [];
+		}
 		// Save plant data into the local storage
 		var plantDataDictArray = makeDictionary(json.rows, json.columns);
 		number_of_returned_data_points = json.rows.length;

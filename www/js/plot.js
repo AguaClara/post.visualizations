@@ -49,6 +49,8 @@ var dataTypes = {
 var dataSave;
 var svg;
 var matches; //Currently selected checkboxes
+var div1; //tooltip divs
+var div2;
 
 /* Create plot .........................................................*/
 var height = 350;
@@ -105,6 +107,17 @@ function visualize(data, codeList) {
   svg = d3.select("#plot").append("svg")
     .attr("height", height)
     .attr("width", width);
+  if (data.length != 0){
+    // Define the div for the tooltip
+    div1 = d3.select("#plot").append("div") 
+        .attr("class", "tooltip")
+        .attr("id", 'div1')       
+        .style("opacity", 0);
+    div2 = d3.select("#plot").append("div") 
+        .attr("class", "tooltip")       
+        .attr("id", 'div2')
+        .style("opacity", 0);
+  }
 
 
   preSelectedItem = makeCheckboxes();
@@ -297,6 +310,201 @@ function drawPlot(data, code, selectedList, codeList){
       yScale2 = makeYScale(data, attr2);
       drawSecondYAxis(yScale2, attr2);
       drawLines(data, xScale, yScale2, attr2, codeList);
+    }
+    else {
+      attr2 = null;
+    }
+
+  }
+  
+  drawSlider(data);  
+
+  //get values
+
+}
+
+//get date object in [arr] closest to [date]
+function nearestDate(date, arr) {
+    var curr = arr[0];
+    var diff = Math.abs (date - curr);
+    for (var val = 0; val < arr.length; val++) {
+        var newdiff = Math.abs (date - arr[val]);
+        if (newdiff < diff) {
+            diff = newdiff;
+            curr = arr[val];
+        }
+    }
+    return curr;
+}
+
+//draw slider for focusing on specific date/value pairs
+function drawSlider(data){
+  //clear residual slider
+  d3.selectAll(".sSlider,.sHandle").remove();
+
+  //get a new array with date values of each datum
+  var a = data.map(function(d) { return new Date(d.timeFinished); });
+  var dateDomain = a;
+
+  var x = xScale;
+
+  //use d3.brush to create a range input
+  var brush = d3.svg.brush()
+      .x(x)
+      .extent([xMin, xMax])
+      .on("brush", brushed);
+  var slider = svg.append("g")
+      .attr("class", "sSlider")
+      .call(brush);
+  slider.selectAll(".extent,.resize")
+      .remove();
+  var handle = slider.append("circle")
+      .attr("class", "sHandle")
+      .attr("transform", "translate(0," + (height-plot_padding_bottom) + ")")
+      .attr("r", 9);
+  slider.call(brush.event)
+      .transition()
+      .duration(750)
+      .call(brush.extent([xMin,xMin]))
+      .call(brush.event);
+
+  //get current value of slider, snap to nearest date, draw focus bars
+  function brushed() {
+    var value = brush.extent()[0];
+    if (d3.event.sourceEvent) { // not a programmatic event
+      value = x.invert(d3.mouse(this)[0]);
+      brush.extent([value, value]);
+    }
+    var nearest = nearestDate(value, dateDomain);
+    handle.attr("cx", x(nearest));
+    d3.selectAll("#sliderLine").remove();
+    svg.append('g').attr("id", "sliderLine")
+        .append("line")
+        .attr('x1', x(nearest))
+        .attr('x2', x(nearest))
+        .attr('y1', 0)
+        .attr('y2', height - plot_padding_bottom)
+        .attr('stroke', 'black') 
+        .attr('stroke-width', 1)
+        .attr('fill', 'none')
+        .attr("id", "sliderLine");;
+
+    //drawFocusHorizon(nearest, dateDomain, data, attr1, attr2);
+    div1.remove();
+    div2.remove();
+    if (data.length != 0){
+      // Define the div for the tooltip
+      div1 = d3.select("#plot").append("div") 
+          .attr("class", "tooltip")
+          .attr("id", 'div1')       
+          .style("opacity", 0);
+      div2 = d3.select("#plot").append("div") 
+          .attr("class", "tooltip")       
+          .attr("id", 'div2')
+          .style("opacity", 0);
+    }
+    drawTooltip(nearest, dateDomain, data);
+  }
+}
+
+function drawFocusHorizon(value, dates, data){
+  var dateCorrespondence = value;
+  var indexCorrespondence = dates.indexOf(dateCorrespondence);
+  var yObject = data[indexCorrespondence];
+  var yDatum1 = +yObject[attr1];
+  console.log("date: " + value.toString());
+  console.log("value1: " + String(yDatum1));
+  svg.append('g').append("line")
+    .attr('x1', plot_padding_left)
+    .attr('x2', width - plot_padding_right)
+    .attr('y1', yScale(yDatum1))
+    .attr('y2', yScale(yDatum1))
+    .attr('stroke', 'black') 
+    .attr('stroke-width', 1)
+    .attr('fill', 'none')
+    .attr("id", "sliderLine");
+  if (attr2 != null){
+    var yDatum2 = +yObject[attr2];
+    svg.append('g').append("line")
+      .attr('x1', plot_padding_left)
+      .attr('x2', width - plot_padding_right)
+      .attr('y1', yScale2(yDatum2))
+      .attr('y2', yScale2(yDatum2))
+      .attr('stroke', 'black') 
+      .attr('stroke-width', 1)
+      .attr('fill', 'none')
+      .attr("id", "sliderLine");
+      console.log("value2: " + String(yDatum2));
+  }
+}
+
+function drawDiv(x, y, d, attr){
+  d.transition()    
+    .duration(200)    
+    .style("opacity", .9);    
+  d.html(x.getDate() + ' ' + es_ES['shortMonths'][x.getMonth()] + ' ' + x.toTimeString().substring(0,8) + "<br/>"  + String(y))  
+    .style("left", (plot.left + xScale(x)) + "px")   
+    .style("top", (plot.top + yScale(y) - plot_padding_bottom) + "px")
+    .style('background', function(){
+      return colors(attr); 
+    });
+}
+
+function collision(div1, div2) {
+      var x1 = div1.offset().left;
+      var y1 = div1.offset().top;
+      var h1 = div1.outerHeight(true);
+      var w1 = div1.outerWidth(true);
+      var b1 = y1 + h1;
+      var r1 = x1 + w1;
+      var x2 = div2.offset().left;
+      var y2 = div2.offset().top;
+      var h2 = div2.outerHeight(true);
+      var w2 = div2.outerWidth(true);
+      var b2 = y2 + h2;
+      var r2 = x2 + w2;
+
+      if (b1 < y2 || y1 > b2 || r1 < x2 || x1 > r2) return false;
+      return true;
+    }
+
+function drawTooltip(value, dates, data) {
+  var dateCorrespondence = value;
+  var indexCorrespondence = dates.indexOf(dateCorrespondence);
+  var yObject = data[indexCorrespondence];
+  var yDatum1 = +yObject[attr1];
+  var plot = $("#plot").position();
+  value = new Date(value);
+  // drawDiv(value, yDatum1, div1, attr1)
+  // if (attr2 != null){
+  //   var yDatum2 = +yObject[attr2];
+  //   div1 = d3.select("#div2");
+  //   drawDiv(value, yDatum2, div2, attr2);
+  // }
+  div1.transition()    
+    .duration(750)    
+    .style("opacity", .9);    
+  div1.html(value.getDate() + ' ' + es_ES['shortMonths'][value.getMonth()] + ' ' + value.toTimeString().substring(0,8) + "<br/>"  + String(yDatum1))  
+    .style("left", (plot.left + xScale(value)) + "px")   
+    .style("top", (plot.top + yScale(yDatum1) - plot_padding_bottom) + "px")
+    .style('background', function(){
+      return colors(attr1); 
+    });
+  if (attr2 != null){
+    var yDatum2 = +yObject[attr2];
+    div2.transition()    
+      .duration(750)    
+      .style("opacity", .9);    
+    div2.html(value.getDate() + ' ' + es_ES['shortMonths'][value.getMonth()] + ' ' + value.toTimeString().substring(0,8) + "<br/>"  + String(yDatum2))  
+      .style("left", (plot.left + xScale(value)) + "px") 
+      .style("top", (plot.top + yScale2(yDatum2) - plot_padding_bottom) + "px")
+      .style('background', function(){
+        return colors(attr2); 
+      });
+    var overlap = collision($("#div1"), $("#div2"));
+    //console.log(overlap);
+    if (overlap) {
+      div1.style("top", (plot.top + yScale2(yDatum2) - plot_padding_bottom - 46) + "px")
     }
   }
 }
