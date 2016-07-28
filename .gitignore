@@ -1,8 +1,8 @@
 # jekyll
 _site
+www/
 
 # project
-_site
 .sass-cache
 .vagrant
 
@@ -13,3 +13,5 @@ ehthumbs.db
 
 # cordova build
 platforms/
+
+POST-release-key.keystore
