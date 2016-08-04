@@ -1,6 +1,4 @@
-# jekyll
-_site
-www/
+# jekyll For the gh-pages branch, we need to push the generated site so that we can access the pages from the www (git doesn't recognize the source command in _config.yml)
 
 # project
 .sass-cache

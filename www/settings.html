@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/favicon/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/favicon/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/favicon/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/favicon/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/favicon/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+<link rel="manifest" href="/favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<html lang="en">
+
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>Wash4All</title>
+
+  <!--  Scripts-->
+  <script src="js/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+  <!--D3 -->
+  <script src="js/d3.v3.min.js" charset="utf-8"></script>
+  <!-- Custom Scripts -->
+  <script src="js/db.js"></script>
+  <script src="js/plot.js"></script>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/viz.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+  rel="stylesheet">
+</head>
+
+  <nav class="light-blue lighten-1" role="navigation">
+  <a href="#" data-activates="nav-mobile" class="button-collapse"><img src="./img/ic_dehaze_2x.png" style="padding:5px;" alt="menu"/></a>
+  <div class="nav-wrapper container"><a id="logo-container" href="./index.html" class="brand-logo" style="padding-left:30px;">OpenSourceWater</a>
+    <ul class="right hide-on-med-and-down">
+      
+<li ><a href="./index.html">Gráficos</a></li>
+<li ><a href="./table.html">Tablas</a></li>
+<li class="active"><a href="./settings.html">Ajustes</a></li>
+<li ><a href="./rep.html">Informes</a></li>
+<li ><a href="./send_web.html">Envitar Datos</a></li>
+    </ul>
+    <ul id="nav-mobile" class="side-nav">
+      
+<li ><a href="./index.html">Gráficos</a></li>
+<li ><a href="./table.html">Tablas</a></li>
+<li class="active"><a href="./settings.html">Ajustes</a></li>
+<li ><a href="./rep.html">Informes</a></li>
+<li ><a href="./send_web.html">Envitar Datos</a></li>
+    </ul>
+  </div>
+</nav>
+
+  <body>
+
+    <div role="main" class="container main-content">
+        <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <!--<h1 class="header center orange-text">Wash4All</h1>-->
+      <div class="row center">
+        <h4 id="datosHeader">Ajustes</h4>
+        <h5 class="header col s12 light">Selecciona la planta los datos de que desea visualizar.</h5>
+      </div>
+      <div id="headerContent"></div>
+      <div class="container">
+        <div class="row center"> 
+        </div>
+      </div>       
+    </div>
+
+    <div class="container">
+      <div class="section">
+      </div>
+      <h5 class="header col s12 light" id="currentChoice"></h5>
+      <form method="post" action=".">
+      <div id="allPlantsDropDown"> 
+      </div>
+           
+
+      <script>
+       
+
+      $(document).ready(function() {
+        $("#currentChoice").html(function(){
+          pname = getPlantName();
+          if (pname!=null){return "Presentemente, su selección es: " +  pname;}
+          return "Ahora no hay selección de planta."
+        }
+        );
+
+        submitRadioValues = function(){
+          addSpinner('#spinnerDestination');
+          plantCode = $('input[name="plantSelection"]:checked').val();
+          save("plantName", plantCode);
+          $("#currentChoice").html(function(){
+            pname = getPlantName();
+            if (pname!=null){return "Presentemente, su selección es: " +  pname;}
+            return "Ahora no hay selección de planta."
+          });
+          setTimeout(function(){$('#spinnerDestination').html("");},500);
+          
+        }
+
+        //No local storage
+        allPlantsDict = getAllPlantsDict();
+        var dropdownHTML = ''; 
+        for(var key in allPlantsDict){
+             plantName = allPlantsDict[key];
+             dropdownHTML +='<p><input name="plantSelection" type="radio" id="'+plantName+'" value="'+plantName+'"';
+             if(getPlantName()==plantName){ dropdownHTML+=" checked";}
+             dropdownHTML+='/><label for="'+plantName+'" class="checkboxtext">'+plantName+'</label></p>';
+        }
+        dropdownHTML+='<br/><a class="waves-effect waves-light btn" id="nameSubmit" onClick="submitRadioValues()">Enviar</a>';
+        $("#allPlantsDropDown").html(dropdownHTML);
+      });
+      
+      </script>
+      
+      <div class="row center" id="spinnerDestination">
+      </div>
+
+    </div>
+    
+    <div class="section"></div>
+  </div>
+    </div>
+
+      <footer class="page-footer light-blue">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">Quienes Somos: OpenSourceWater</h5>
+          <p class="grey-text text-lighten-4">En el mundo hay miles de millones de personas quienes viven con agua contaminada y saneamiento inadecuado. Los proyectos de desarrollo que tienen como objetivo solucionar este problema generalmente son muy costosos, logran muy poco y no están siendo documentados. WASH4ALL está buscando mejorar el acceso universal al agua y saneamiento mediante herramientas que permitan mostrar y ubicar las necesidades, quienes y cómo están trabajando para solventarlas y donde se están alcanzando las metas.</p>
+
+        </div>
+        
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+      Hecho por <a class="light-blue-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+      </div>
+    </div>
+  </footer>
+
+
+
+  </body>
+</html>
+
+  </body>
+</html>
