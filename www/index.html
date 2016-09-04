@@ -116,18 +116,7 @@
 
 
         if (getPlantName()==null){
-          //No local storage
-          allPlantsDict = getAllPlantsDict();
-          var dropdownHTML = ''; 
-          for(var key in allPlantsDict){
-               plantName = allPlantsDict[key];
-               dropdownHTML +='<p><input name="plantSelection" type="radio" id="'+plantName+'" value="'+plantName+'" /><label for="'+plantName+'">'+plantName+'</label></p>';
-          }
-          dropdownHTML+='<br/><a class="waves-effect waves-light btn" id="nameSubmit" onClick="submitRadioValues()">Enviar</a>';
-          $("#allPlantsDropDown").html(dropdownHTML);
-          $("#syncButtonDiv").html("");
-          $("#selectPrompt").html("Selecciona la planta los datos de que desea visualizar.");
-
+          window.location.replace("./settings.html");
         }else{
           $("#selectPrompt").html("");
           $("#syncButtonDiv").html("<a id='sync-viz' class='waves-effect waves-light btn'>Sincronizar</a>");
