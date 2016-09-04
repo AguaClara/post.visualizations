@@ -6,3 +6,10 @@ We use both [Jekyll](http://jekyllrb.com/) and [Phonegap](http://phonegap.com/) 
 
 ## Running in the Android emulator
 You can run the app in the Android emulator with this comand: `cordova run android`. By default, your emulator will run extremely slowly. We recommend installing the Intel x_86 system image to get 10x better performance using [this guide.](http://stackoverflow.com/questions/2662650/making-the-android-emulator-run-faster) 
+
+## Generating a signed APK
+You should just need to run `cordova build android --release` and it will request the password for the keystore, which is located in the password doc. The path to the signed apk will show up in the terminal. If you're recieving an error, you can add the `-d` flag. This command looks for the keystore in the location specified here in the /platforms/android/release-signing.properties file. 
+
+## Upload apk
+* You need a signed release apk ready to upload to the store for this step (see above)
+* simply sign onto the POST AguaClara email account (credentials in drive) and upload the apk to [here](https://play.google.com/apps/publish/?dev_acc=18423817182957885233#ApkPlace:p=tmp.18423817182957885233.1463749987830)
