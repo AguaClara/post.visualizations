@@ -8,8 +8,3 @@
 .DS_Store
 Thumbs.db
 ehthumbs.db
-
-# cordova build
-platforms/
-
-POST-release-key.keystore
