@@ -25,7 +25,7 @@ var number_of_non_data_storage_items = 2;
 function encode_fusion_table_sql(sql_string) {
 	var base_url = "https://www.googleapis.com/fusiontables/v2/";
 	var initiate_sql_query = "query?sql=";
-	var api_key = "&key=AIzaSyB9wik36h46yNJznjYjUTXHOu5py9anRFY";
+	var api_key = "&key=AIzaSyB4fY4TPsWMhqifu68GFq1aWREjiiAYZmo";
 	url_string = base_url + initiate_sql_query + encodeURIComponent(sql_string) + api_key;
 	return url_string
 }
