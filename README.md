@@ -14,3 +14,4 @@ You should just need to run `cordova build android --release` and it will reques
 * Make sure you increment the version code from the last time the apk was uploaded. The version code is located in the config.xml file in the first tag. 
 * You need a signed release apk ready to upload to the store for this step (see above)
 * simply sign onto the POST AguaClara email account (credentials in drive) and upload the apk
+* upload to beta first, "promote" to production after verification
