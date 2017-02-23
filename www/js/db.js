@@ -10,7 +10,7 @@
 
 var table_id = "1Sk13vckXZIuOaokQ6tbOkHjRAthBFF7FkgsGaSjD"
 var number_of_requested_data_points = 100;
-var api_key = "&key=AIzaSyAAWkBly-1cwH3rbyLIhoZtJAY3RUHrViM";
+var api_key = "&key=AIzaSyB4fY4TPsWMhqifu68GFq1aWREjiiAYZmo";
 
 // We only know how many data points there are for a specific plant request when we actually get the response
 // but in that response there may be some duplicates that we only discover when putting into the localStorage...
