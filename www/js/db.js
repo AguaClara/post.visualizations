@@ -178,6 +178,7 @@ function getAllPlantsDict(){
 		"moro":"Moroceli", 
 		"smat":"San Matias", 
 		"snic":"San Nicolas", 
-		"tam":"Tamara"
+		"tam":"Tamara",
+		"lasv":"Las Vegas"
 	}
 };
