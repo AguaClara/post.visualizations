@@ -179,6 +179,7 @@ function getAllPlantsDict(){
 		"smat":"San Matias", 
 		"snic":"San Nicolas", 
 		"tam":"Tamara",
-		"lasv":"Las Vegas"
+		"lasv":"Las Vegas",
+		"sjg":"San Juan Guarita"
 	}
 };
