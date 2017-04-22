@@ -21,7 +21,7 @@ table1Dict = {"timeFinished":"Hora de<br/>finalización",
               "coagulantDose":"Dosis de<br/>coagulantes (mg/L)",
               "rawWaterTurbidity":"Turbiedad de agua<br/>cruda (NTU)",
               "settledWaterTurbidity":"Turbiedad de agua<br/>decantada (NTU)",
-              "filteredWaterTurbidity":"Turbiedad de agua<br/>filtrada (NTU)",
+              "filteredWaterTurbidity1":"Turbiedad de agua<br/>filtrada (NTU)",
               "chlorineDose":"Dosis de<br/>cloro (mg/L)",
               "entranceWaterLevel":"Nivel de agua en la caja<br/>de entrada al filtro (cm)",
               "comments":"Comentarios<br/><span style='opacity:0'>--</span>"};
@@ -30,7 +30,7 @@ table2Dict = {"purpose":"Propósito",
               "timeStarted":"Fecha de registro",
               "timeCollected":"Hora de recoger los datos",
               "repairsDoneOther":"Mantenimientos hechos",
-              "backwashTime":"Hora de retrolavado"};
+              "backwashDate":"Hora de retrolavado"};
 
 
 /*Create two tables featuring plant data and maintenance reports.*/

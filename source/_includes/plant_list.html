@@ -1,0 +1,15 @@
+<span id="plantListCollapsible"></span>
+<script type="text/javascript">
+	allPlantsDict = getAllPlantsDict();
+	var menuHTML = ''; 
+	var currentPlant = getPlantName();
+	for(var key in allPlantsDict){
+		plantName = allPlantsDict[key];
+		active = "";
+		plantNameString = "'" + plantName + "'";
+		if (currentPlant == plantName)
+			active = 'light-blue lighten-5'
+		menuHTML += '<li><button type="submit" onClick="changePlant(' + plantNameString + ')" name="changePlant" class="white plantButton waves-effect '+ active + '"' + 'value="' + plantName + '">'+plantName+'</button>';
+	}
+	$("#plantListCollapsible").html(menuHTML);
+</script>

@@ -17,21 +17,22 @@
 <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
 <meta name="theme-color" content="#ffffff">
 <html lang="en">
-
-  <head>
+<head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
-  <title>Wash4All</title>
+  <title>POST</title>
 
   <!--  Scripts-->
   <script src="js/jquery-2.1.1.min.js"></script>
   <script src="js/materialize.js"></script>
   <script src="js/init.js"></script>
+  <script src="js/JSON-js-master/json_parse.js"></script>
   <!--D3 -->
   <script src="js/d3.v3.min.js" charset="utf-8"></script>
   <!-- Custom Scripts -->
   <script src="js/db.js"></script>
   <script src="js/plot.js"></script>
+  <script src="js/dom.js"></script>
 
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -42,31 +43,70 @@
   rel="stylesheet">
 </head>
 
-  <nav class="light-blue lighten-1" role="navigation">
-  <a href="#" data-activates="nav-mobile" class="button-collapse"><img src="./img/ic_dehaze_2x.png" style="padding:5px;" alt="menu"/></a>
-  <div class="nav-wrapper container"><a id="logo-container" href="./index.html" class="brand-logo" style="padding-left:30px;">OpenSourceWater</a>
-    <ul class="right hide-on-med-and-down">
-      
-<li ><a href="./index.html">Gráficos</a></li>
-<li ><a href="./table.html">Tablas</a></li>
-<li class="active"><a href="./settings.html">Ajustes</a></li>
-    </ul>
-    <ul id="nav-mobile" class="side-nav">
-      
-<li ><a href="./index.html">Gráficos</a></li>
-<li ><a href="./table.html">Tablas</a></li>
-<li class="active"><a href="./settings.html">Ajustes</a></li>
-    </ul>
-  </div>
+<header>
+	<nav class="light-blue lighten-1" role="navigation">
+	<script>
+		$(".button-collapse").sideNav();
+		$('.collapsible').collapsible();
+		var changePlant = function(d){
+			save("plantName", d);
+			window.location.href = "/index.html";
+		};
+	</script>
+	<div class="nav-wrapper container"><a id="logo-container" href="./index.html" class="brand-logo right" style="padding-left:30px;">POST</a>
+		<ul class="left">
+			<li><a href="#" data-activates="slide-out" class="button-collapse show-on-large"><i class="material-icons">menu</i></a></li>
+			<span class="hide-on-med-and-down">
+<li ><a class="waves-effect" href="./index.html">La Planta</a></li>
+<li ><a class="waves-effect" href="./about.html">Quien Somos</a></li>
+</span>
+		</ul>
+	</div>
 </nav>
+<ul id="slide-out" class="side-nav">
+	<span class="hide-on-large-only">
+		
+<li ><a class="waves-effect" href="./index.html">La Planta</a></li>
+<li ><a class="waves-effect" href="./about.html">Quien Somos</a></li>
 
-  <body>
+		<li><div class="divider"></div></li>
+	</span>
+	<li class="no-padding">
+		<ul class="collapsible collapsible-accordion">
+			<li>
+				<a class="collapsible-header active">Lista de Plantas<i class="material-icons" style="float:right; margin-right: 0px">arrow_drop_down</i></a>
+				<div class="collapsible-body">
+					<ul>
+						<span id="plantListCollapsible"></span>
+<script type="text/javascript">
+	allPlantsDict = getAllPlantsDict();
+	var menuHTML = ''; 
+	var currentPlant = getPlantName();
+	for(var key in allPlantsDict){
+		plantName = allPlantsDict[key];
+		active = "";
+		plantNameString = "'" + plantName + "'";
+		if (currentPlant == plantName)
+			active = 'light-blue lighten-5'
+		menuHTML += '<li><button type="submit" onClick="changePlant(' + plantNameString + ')" name="changePlant" class="white plantButton waves-effect '+ active + '"' + 'value="' + plantName + '">'+plantName+'</button>';
+	}
+	$("#plantListCollapsible").html(menuHTML);
+</script>
+					</ul>
+				</div>
+			</li>
+		</ul>
+	</li>
+</ul>
+</header>
 
-    <div role="main" class="container main-content">
-        <div class="section no-pad-bot" id="index-banner">
+<body>
+
+	<main>
+		<div class="container main-container">
+			  <div class="section no-pad-bot" id="index-banner">
     <div class="container">
       <br><br>
-      <!--<h1 class="header center orange-text">Wash4All</h1>-->
       <div class="row center">
         <h4 id="datosHeader">Ajustes</h4>
         <h5 class="header col s12 light">Selecciona la planta los datos de que desea visualizar.</h5>
@@ -84,47 +124,15 @@
       <h5 class="header col s12 light" id="currentChoice"></h5>
       <form method="post" action=".">
       <div id="allPlantsDropDown"> 
-      </div>
-           
-
+      </div>           
       <script>
-       
 
       $(document).ready(function() {
-        $("#currentChoice").html(function(){
-          pname = getPlantName();
-          if (pname!=null){return "Presentemente, su selección es: " +  pname;}
-          return "Ahora no hay selección de planta."
-        }
-        );
-
-        submitRadioValues = function(){
-          addSpinner('#spinnerDestination');
-          plantCode = $('input[name="plantSelection"]:checked').val();
-          save("plantName", plantCode);
-          $("#currentChoice").html(function(){
-            pname = getPlantName();
-            if (pname!=null){return "Presentemente, su selección es: " +  pname;}
-            return "Ahora no hay selección de planta."
-          });
-          window.location.href = "./index.html";
-        }
-
-        //No local storage
-        allPlantsDict = getAllPlantsDict();
-        var dropdownHTML = ''; 
-        for(var key in allPlantsDict){
-             plantName = allPlantsDict[key];
-             dropdownHTML +='<p><input name="plantSelection" type="radio" id="'+plantName+'" value="'+plantName+'"';
-             if(getPlantName()==plantName){ dropdownHTML+=" checked";}
-             dropdownHTML+='/><label for="'+plantName+'" class="checkboxtext">'+plantName+'</label></p>';
-        }
-        dropdownHTML+='<br/><a class="waves-effect waves-light btn" id="nameSubmit" onClick="submitRadioValues()">Enviar</a>';
-        $("#allPlantsDropDown").html(dropdownHTML);
+        addCurrentChoiceHeader();
+        addPlantDropdown();
       });
       
       </script>
-      
       <div class="row center" id="spinnerDestination">
       </div>
 
@@ -132,30 +140,18 @@
     
     <div class="section"></div>
   </div>
-    </div>
+		</div>
+	</main>
 
-      <footer class="page-footer light-blue">
-    <div class="container">
-      <div class="row">
-        <div class="col l6 s12">
-          <h5 class="white-text">Quienes Somos: OpenSourceWater</h5>
-          <p class="grey-text text-lighten-4">En el mundo hay miles de millones de personas quienes viven con agua contaminada y saneamiento inadecuado. Los proyectos de desarrollo que tienen como objetivo solucionar este problema generalmente son muy costosos, logran muy poco y no están siendo documentados. WASH4ALL está buscando mejorar el acceso universal al agua y saneamiento mediante herramientas que permitan mostrar y ubicar las necesidades, quienes y cómo están trabajando para solventarlas y donde se están alcanzando las metas.</p>
-
-        </div>
-        
-      </div>
-    </div>
+	  <footer class="page-footer light-blue">
     <div class="footer-copyright">
       <div class="container">
       Hecho por <a class="light-blue-text text-lighten-3" href="http://materializecss.com">Materialize</a>
       </div>
     </div>
   </footer>
-
-
-
   </body>
 </html>
 
-  </body>
+</body>
 </html>

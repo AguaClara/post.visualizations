@@ -1,4 +1,3 @@
 {% assign current = page.url | downcase | split: '/' %}
-<li {% if current[1] == 'index.html' %}class="active"{% endif %}><a href="./index.html">Gráficos</a></li>
-<li {% if current[1] == 'table.html' %}class="active"{% endif %}><a href="./table.html">Tablas</a></li>
-<li {% if current[1] == 'settings.html' %}class="active"{% endif %}><a href="./settings.html">Ajustes</a></li>
+<li {% if current[1] == 'index.html' %}class="active"{% endif %}><a class="waves-effect" href="./index.html">La Planta</a></li>
+<li {% if current[1] == 'about.html' %}class="active"{% endif %}><a class="waves-effect" href="./about.html">Quien Somos</a></li>

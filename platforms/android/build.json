@@ -1,0 +1,18 @@
+{
+    "android": {
+        "debug": {
+            "keystore": "../android.keystore",
+            "storePassword": "android",
+            "alias": "mykey1",
+            "password" : "password",
+            "keystoreType": ""
+        },
+        "release": {
+            "keystore": "C:/Users/O/Desktop/POST/keys/post.visualizations-release.keystore",
+            "storePassword": "POST4cleanerh2o",
+            "alias": "post_key",
+            "password" : "POST4cleanerh2o",
+            "keystoreType": ""
+        }
+    }
+}
