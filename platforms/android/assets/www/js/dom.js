@@ -20,7 +20,7 @@ function addDatosHeader(){
 /* Force plant selection */
 function checkPlantSelection(){
 	if (getPlantName()==null){
-	  window.location.replace("/settings.html");
+	  window.location.replace("../settings.html");
 	}
 	else{
 	  $("#selectPrompt").html("");
