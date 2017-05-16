@@ -8,6 +8,7 @@ We use both [Jekyll](http://jekyllrb.com/) and [Cordova](https://cordova.apache.
 * download and setup [jekyll](https://jekyllrb.com/docs/installation/)
 * install node by downloading [here](https://nodejs.org/en/) to get npm
 * install cordova with npm (`$sudo npm install -g cordova`) note for windows this command/process will differ.
+* download and install the [Java development kit](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
 To verify all the tools are working, after you git clone the repo and cd into the first directory, you should be able to serve the website locally as mentioned below and run the app on the emulator or a connected phone.
 
