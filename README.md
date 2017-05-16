@@ -2,7 +2,17 @@
 Visualization app for the Plant Operations Smartphone Tracker (POST) team of AguaClara. This app is used by AguaClara plant operators to visualize their plant performance data submitted with the post.collect application. 
 
 ## Developing
-We use both [Jekyll](http://jekyllrb.com/) and [Phonegap](http://phonegap.com/) to build a web app that we can send to the [Playstore here](https://play.google.com/store/apps/details?id=org.aguaclara.post.visualizations). Jekyll enables us to reduce code duplication by using include statements and layouts, and organizes our website/app structure. Jekyll reads the _config.yml document located in the root of the repo to determine which folder jekyll uses as source to build the website. Jekyll builds the resulting website in the specified destination folder (the www folder). Therefore only files in the "source" folder should be edited, whereas editing a file in the "www" folder will just get overwritten the next time Jekyll is ran to build the static site. Once you are done editing a source file, you can test the code by running `jekyll serve` to start a server on your localhost (you must have [Jekyll installed locally](https://jekyllrb.com/docs/installation/) for this to work). Once satisfied, you can build the apk using the cordova command line tool with the following command: `cordova build android`. That will generate a development apk.
+
+We use both [Jekyll](http://jekyllrb.com/) and [Cordova](https://cordova.apache.org/) to build a web app that we can send to the [Playstore here](https://play.google.com/store/apps/details?id=org.aguaclara.post.visualizations). To start developing the applications, you will need to:
+* download and setup the Android SDK [(use this guide to install the SDK and the emulator)](http://spring.io/guides/gs/android/)
+* download and setup [jekyll](https://jekyllrb.com/docs/installation/)
+* install node by downloading [here](https://nodejs.org/en/) to get npm
+* install cordova with npm (`$sudo npm install -g cordova`) note for windows this command/process will differ.
+
+To verify all the tools are working, after you git clone the repo and cd into the first directory, you should be able to serve the website locally as mentioned below and run the app on the emulator or a connected phone.
+
+## Serving the app locally using Jekyll
+Jekyll enables us to reduce code duplication by using include statements and layouts, and organizes our website/app structure. Jekyll reads the _config.yml document located in the root of the repo to determine which folder jekyll uses as source to build the website. Jekyll builds the resulting website in the specified destination folder (the www folder). Therefore only files in the "source" folder should be edited, whereas editing a file in the "www" folder will just get overwritten the next time Jekyll is ran to build the static site. Once you are done editing a source file, you can test the code by running `$jekyll serve` to start a server on your localhost (you must have [Jekyll installed locally](https://jekyllrb.com/docs/installation/) for this to work). Once satisfied, you can build the apk using the cordova command line tool with the following command: `cordova build android`. That will generate a development apk.
 
 ## Running in the Android emulator
 You can run the app in the Android emulator with this comand: `cordova run android`. By default, your emulator will run extremely slowly. We recommend installing the Intel x_86 system image to get 10x better performance using [this guide.](http://stackoverflow.com/questions/2662650/making-the-android-emulator-run-faster) 
