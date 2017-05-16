@@ -2,6 +2,9 @@
 platforms/
 plugins/
 
+# Jekyll
+www/
+
 # project
 .sass-cache
 .vagrant
