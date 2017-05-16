@@ -8,7 +8,8 @@ We use both [Jekyll](http://jekyllrb.com/) and [Phonegap](http://phonegap.com/) 
 You can run the app in the Android emulator with this comand: `cordova run android`. By default, your emulator will run extremely slowly. We recommend installing the Intel x_86 system image to get 10x better performance using [this guide.](http://stackoverflow.com/questions/2662650/making-the-android-emulator-run-faster) 
 
 ## Generating a signed APK
-You should just need to run `cordova build android --release` and it will request the password for the keystore, which is located in the password doc. The path to the signed apk will show up in the terminal. If you're recieving an error, you can add the `-d` flag. This command looks for the keystore in the location specified here in the /platforms/android/release-signing.properties file. 
+You should just need to run `cordova build android --release` and Cordova will build an unsigned APK and put it in `platforms\android\build\outputs\apk`. The path to the un-signed apk will show up in the terminal (may be different). If you're recieving an error, you can add the `-d` flag to see why. Now you need to sign your app. You should follow [this guide](http://stackoverflow.com/questions/26449512/how-to-create-a-signed-apk-file-using-cordova-command-line-interface) (step 5) for signing. Long story short: `jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore <keystorename <Unsigned APK file> <Keystore Alias name>` Find the keystore and keystore password and alias in the drive Passwords/Certs folder.
+  
 
 ## Upload apk
 * Make sure you increment the version code from the last time the apk was uploaded. The version code is located in the config.xml file in the first tag. 
