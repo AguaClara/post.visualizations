@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 {% include favicon.html %}
 <html lang="en">
-{% include head.html %}
 
-<header>
-	{% include nav.html %}
-</header>
+  {% include head.html %}
 
-<body>
+  {% include nav.html %}
 
-	<main>
-		<div class="container main-container">
-			{{ content }}
-		</div>
-	</main>
+  <body>
 
-	{% include footer.html %}
+    <div role="main" class="container main-content">
+      {{ content }}
+    </div>
 
-</body>
+    {% include footer.html %}
+
+  </body>
 </html>

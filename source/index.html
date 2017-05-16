@@ -2,36 +2,80 @@
 layout: default
 title: POST
 ---
-<script type="text/javascript">
-  $(document).ready(function(){
-    $('ul.tabs').tabs({
-      'swipeable': true // can only work if 
-    });
-  });
-</script>
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+        <div class="row center">
+        <h4 id="datosHeader"></h4>
+        <script>
+        var pname = getPlantName();
+        if(pname != null){$("#datosHeader").html("Datos Sobre la Planta de "+pname);}
+        else{$("#datosHeader").html("Datos Sobre la Planta");}
+        
+        </script>
+        <h5 class="header col s12 light">Selecciona lo que desea visualizar.</h5>
+      </div>
+      <div id="headerContent"></div>
+      <div class="container">
+        <div class="row center"> 
+        </div>
+      </div>       
+    </div>
 
-<div class="container">
-  <div class="row">   
-    <h3 class="center" id="plant"></h3>
-    <script type="text/javascript">     
-      var pname = getPlantName();
-      if(pname != null){$("#plant").html(pname)};
-    </script>
-  </div>
-  <div class="row">
-    <div class="col s12">
-      <ul class="tabs">
-        <li class="tab col s6"><a href="#graphs">Graficos</a></li>
-        <li class="tab col s6"><a href="#tables">Tablas</a></li></li>
-      </ul>
-    </div>
-    <div class="tab-container" height="200px">
-      <div id="graphs" class="col s12">
-        {% include graphs.html %}
+    <div class="container">
+      <div class="section">
+        <div class="checkboxesForm"></div>
+        <div id="visualizer"></div>
+        <div id="plot"></div>
       </div>
-      <div id="tables" class="col s12">
-        {% include table.html %}
+      <h5 class="header col s12 light" id="selectPrompt"></h5>
+      <form method="post" action=".">
+      <div id="allPlantsDropDown"> 
       </div>
+           
+
+      <script>
+       
+
+      $(document).ready(function() {
+        submitRadioValues = function(){
+          plantCode = $('input[name="plantSelection"]:checked').val();
+          save("plantName", plantCode);
+          $("#allPlantsDropDown").html("");
+          connectSyncButton();
+          codeList = [plantCode];
+          initViz(codeList);
+          $("#datosHeader").html("Datos Sobre la Planta de "+plantCode);
+          $("#syncButtonDiv").html("<a id='sync-viz' class='waves-effect waves-light btn'>Sincronizar</a>");
+          connectSyncButton();
+          addSpinner('#spinnerDestination');
+          updatePlantData(visualize, codeList);
+          $("#selectPrompt").html("");
+        }
+
+
+        if (getPlantName()==null){
+          window.location.replace("./settings.html");
+        }else{
+          $("#selectPrompt").html("");
+          $("#syncButtonDiv").html("<a id='sync-viz' class='waves-effect waves-light btn'>Sincronizar</a>");
+          var codeList = [getPlantName()]; //list of currently chosen plants (by code)
+          connectSyncButton();
+          initViz(codeList);
+          addSpinner('#spinnerDestination');
+          updatePlantData(visualize, codeList);
+        }
+      });
+      
+      </script>
+
+
+      <div class="row center" id="syncButtonDiv"><a id='sync-viz' class="waves-effect waves-light btn">Sincronizar</a></div>
+      
+      <div class="row center" id="spinnerDestination">
+      </div>
+
     </div>
+    
+    <div class="section"></div>
   </div>
-</div>

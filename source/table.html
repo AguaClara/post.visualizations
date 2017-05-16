@@ -1,0 +1,47 @@
+---
+layout: default
+title: POST
+---
+<script src="js/table.js"></script>
+
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <!--<h1 class="header center orange-text">Wash4All</h1>-->
+      <div class="row center">
+        <h4 id="datosHeader"></h4>
+        <script>
+        var pname = getPlantName();
+        if(pname != null){$("#datosHeader").html("Datos Sobre la Planta de "+pname);}
+        else{$("#datosHeader").html("Datos Sobre la Planta");}
+        
+        </script>
+        <h5 class="header col s12 light">Selecciona lo que desea visualizar.</h5>
+        <h5 class="header col s12 light">Explora las tablas de datos de los últimos 7 días.</h5>
+        
+      </div>
+      <div id="headerContent">
+      </div>
+      <div class="container">
+        <div class="row center"> 
+        </div>
+      </div>       
+    </div>
+      
+    <h5 class="header col 12 light-blue-text center">Datos de la Planta</h5><br/>
+    <div class="container" id = "container"></div>
+    <br/><br/>
+    
+    <h5 class="header col 12 light-blue-text center">Diaro de la Planta</h5><br/>
+    <div class="container" id = "container2"></div>
+    <br/><br/>
+
+    <h5 class="header col 12 light-blue-text center">Datos de Backwash</h5><br/>
+    <div class="container" id = "container3"></div>
+    <br/><br/>
+
+
+    <div class="row center"><a id='sync-table' class="waves-effect waves-light btn">Sincronizar</a></div>
+    <div class="row center" id="spinnerDestination"></div>
+    <br/><br/>
+    </div>

@@ -1,34 +1,11 @@
 <nav class="light-blue lighten-1" role="navigation">
-	<script>
-		$(".button-collapse").sideNav();
-		$('.collapsible').collapsible();
-		var changePlant = function(d){
-			save("plantName", d);
-			window.location.href = "/index.html";
-		};
-	</script>
-	<div class="nav-wrapper container"><a id="logo-container" href="./index.html" class="brand-logo right" style="padding-left:30px;">POST</a>
-		<ul class="left">
-			<li><a href="#" data-activates="slide-out" class="button-collapse show-on-large"><i class="material-icons">menu</i></a></li>
-			<span class="hide-on-med-and-down">{% include nav_list.html %}</span>
-		</ul>
-	</div>
+  <a href="#" data-activates="nav-mobile" class="button-collapse"><img src="./img/ic_dehaze_2x.png" style="padding:5px;" alt="menu"/></a>
+  <div class="nav-wrapper container"><a id="logo-container" href="./index.html" class="brand-logo" style="padding-left:30px;">OpenSourceWater</a>
+    <ul class="right hide-on-med-and-down">
+      {% include nav_list.html %}
+    </ul>
+    <ul id="nav-mobile" class="side-nav">
+      {% include nav_list.html %}
+    </ul>
+  </div>
 </nav>
-<ul id="slide-out" class="side-nav">
-	<span class="hide-on-large-only">
-		{% include nav_list.html %}
-		<li><div class="divider"></div></li>
-	</span>
-	<li class="no-padding">
-		<ul class="collapsible collapsible-accordion">
-			<li>
-				<a class="collapsible-header active">Lista de Plantas<i class="material-icons" style="float:right; margin-right: 0px">arrow_drop_down</i></a>
-				<div class="collapsible-body">
-					<ul>
-						{% include plant_list.html %}
-					</ul>
-				</div>
-			</li>
-		</ul>
-	</li>
-</ul>
