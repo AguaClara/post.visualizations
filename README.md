@@ -15,3 +15,6 @@ You should just need to run `cordova build android --release` and it will reques
 * You need a signed release apk ready to upload to the store for this step (see above)
 * simply sign onto the POST AguaClara email account (credentials in drive) and upload the apk
 * upload to beta first, "promote" to production after verification
+
+## Adding plugins or platforms
+We don't save the platforms and plugins file to github, and therefore we need to save a state of supported platforms and plugins to the config file of Cordova. This can be done by running `$cordova platform save` and `$cordova plugin save`. Now the updated state is saved in the config.xml file.
