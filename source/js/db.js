@@ -8,7 +8,7 @@
 // Methods to be used from outside scripts. Clearly defined with easy to understand
 // pre- and post- conditions
 
-var table_id = "1Sk13vckXZIuOaokQ6tbOkHjRAthBFF7FkgsGaSjD"
+var table_id = "14iS92Ep_8pfzwih-Hw-mn2o38_Mp31HOJ2BnI6rQ"
 var number_of_requested_data_points = 100;
 var api_key = "&key=AIzaSyAAWkBly-1cwH3rbyLIhoZtJAY3RUHrViM";
 
